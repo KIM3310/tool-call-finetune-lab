@@ -1,0 +1,56 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tool-call-finetune-lab"
+version = "0.1.0"
+description = "LoRA fine-tuning for tool-calling reliability, BFCL evaluation, and vLLM serving"
+license = {text = "Apache-2.0"}
+requires-python = ">=3.10"
+authors = [{name = "Doeon Kim", email = "ehdjs1351@gmail.com"}]
+dependencies = [
+    "openai>=1.50.0",
+    "httpx>=0.27.0",
+    "huggingface-hub>=0.26.0",
+    "datasets>=3.0.0",
+]
+
+[project.optional-dependencies]
+train = [
+    "torch>=2.1.0",
+    "transformers>=4.44.0",
+    "peft>=0.13.0",
+    "trl>=0.12.0",
+    "accelerate>=1.0.0",
+    "bitsandbytes>=0.44.0",
+    "wandb>=0.18.0",
+]
+quantize = [
+    "autoawq>=0.2.7",
+]
+serve = [
+    "vllm>=0.6.0",
+]
+gpu = [
+    "tool-call-finetune-lab[train,quantize,serve]",
+]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.8.0",
+    "mypy>=1.13",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
+ignore = ["E501", "UP006", "UP035", "UP045", "F401", "F541", "I001"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
