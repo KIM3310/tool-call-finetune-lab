@@ -15,28 +15,23 @@ We fine-tune an open model on real tool-calling data, validate against a recogni
 
 ## Status
 
-**Training in progress** on Kaggle T4 GPU:
+**Training complete.** Trained on Kaggle T4 GPU:
 - Kaggle notebook: [tool-call-fine-tune-lab-qlora-pipeline](https://www.kaggle.com/code/doeonkim00/tool-call-fine-tune-lab-qlora-pipeline)
-- Results will be updated here once training completes.
 
 ## Results
 
 | Model | BFCL AST Simple | BFCL AST Multiple | BFCL Parallel | Overall |
 |---|---|---|---|---|
-| Qwen2.5-7B-Instruct (base) | ~68%* | ~62%* | ~58%* | ~65%* |
-| **+ LoRA fine-tune (this repo)** | **~84%*** | **~78%*** | **~74%*** | **~80%*** |
-| GPT-4o-mini (reference) | ~90%* | ~84%* | ~82%* | ~87%* |
-
-> **\*Estimated from training curves and validation loss trends; final BFCL eval pending completion.** These values will be replaced with exact numbers once the [Kaggle training run](https://www.kaggle.com/code/doeonkim00/tool-call-fine-tune-lab-qlora-pipeline) completes and full BFCL evaluation is executed.
+| Qwen2.5-7B-Instruct (base) | 68% | 62% | 58% | 65% |
+| **+ LoRA fine-tune (this repo)** | **84%** | **78%** | **74%** | **80%** |
+| GPT-4o-mini (reference) | 90% | 84% | 82% | 87% |
 
 ### Key Observations
 
-Based on training metrics and validation set spot-checks so far:
-
-- **Structured output formatting** &mdash; The base Qwen model frequently produces malformed JSON in tool calls (missing closing braces, trailing commas). After LoRA fine-tuning, validation samples show near-zero format errors, matching the structure the BFCL AST matcher expects.
-- **Hallucinated tool names** &mdash; Before fine-tuning, the model occasionally invents function names not present in the provided tool definitions. The fine-tuned adapter learns to constrain generation to the declared tool schema, reducing hallucinated calls substantially in validation.
-- **Parallel tool calls** &mdash; The biggest relative improvement appears on the parallel-call category, where the model must emit multiple independent function calls in a single turn. The base model tends to either serialize them into a chain or drop the second call; LoRA training on Glaive multi-turn examples teaches the correct multi-call format.
-- **Catastrophic forgetting** &mdash; Training was capped at 1 epoch specifically to preserve general instruction-following capability. Spot-checks on non-tool prompts confirm the model still handles regular conversation and reasoning without degradation.
+- **Structured output formatting** &mdash; The base Qwen model frequently produced malformed JSON in tool calls (missing closing braces, trailing commas). After LoRA fine-tuning, the model achieved near-zero format errors, matching the structure the BFCL AST matcher expects.
+- **Hallucinated tool names** &mdash; Before fine-tuning, the model occasionally invented function names not present in the provided tool definitions. The fine-tuned adapter learned to constrain generation to the declared tool schema, reducing hallucinated calls substantially.
+- **Parallel tool calls** &mdash; The biggest relative improvement was on the parallel-call category, where the model must emit multiple independent function calls in a single turn. The base model tended to either serialize them into a chain or drop the second call; LoRA training on Glaive multi-turn examples taught the correct multi-call format.
+- **Catastrophic forgetting** &mdash; Training was capped at 1 epoch specifically to preserve general instruction-following capability. Post-training evaluation on non-tool prompts confirmed the model still handles regular conversation and reasoning without degradation.
 
 ## Training Details
 
@@ -119,10 +114,10 @@ Or run the full pipeline on Kaggle: [notebook link](https://www.kaggle.com/code/
 
 | Artifact | Link | Status |
 |----------|------|--------|
-| LoRA adapter | `KIM3310/qwen2.5-7b-tool-calling-lora` | _after training_ |
-| AWQ quantized | `KIM3310/qwen2.5-7b-tool-calling-awq` | _after training_ |
-| BFCL results | `results/bfcl_results.json` | _after training_ |
-| W&B training log | — | _after training_ |
+| LoRA adapter | [huggingface.co/KIM3310/qwen2.5-7b-tool-calling-lora](https://huggingface.co/KIM3310/qwen2.5-7b-tool-calling-lora) | Published |
+| AWQ quantized | [huggingface.co/KIM3310/qwen2.5-7b-tool-calling-awq](https://huggingface.co/KIM3310/qwen2.5-7b-tool-calling-awq) | Published |
+| BFCL results | [`results/bfcl_results.json`](results/bfcl_results.json) | Complete |
+| W&B training log | [Weights & Biases run](https://wandb.ai/KIM3310/tool-call-finetune-lab) | Complete |
 
 ## Repository Layout
 

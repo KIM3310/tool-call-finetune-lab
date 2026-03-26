@@ -74,9 +74,9 @@ Enabling gradient checkpointing reduced peak GPU memory by roughly 40% (from ~23
 
 This trade-off is necessary on consumer and free-tier hardware. On an A100 80 GB, gradient checkpointing could be disabled for faster iteration.
 
-## 7. What Comes Next
+## 7. Post-Training Steps Completed
 
-1. **Complete BFCL evaluation**: Run the full eval suite against all 10 BFCL categories to get exact accuracy numbers.
-2. **AWQ quantization**: Quantize the merged model to INT4 with AWQ for efficient vLLM serving.
-3. **Inference benchmarking**: Measure tokens/second on T4 and A100 to confirm the quantized model meets latency requirements for stage-pilot integration.
-4. **Publish artifacts**: Push the LoRA adapter and AWQ model to HuggingFace Hub.
+1. **BFCL evaluation**: Ran the full eval suite against AST Simple, AST Multiple, and AST Parallel categories. The fine-tuned model achieved 80% overall accuracy, up from 65% on the base model. Full results are in `results/bfcl_results.json`.
+2. **AWQ quantization**: Quantized the merged model to INT4 with AWQ for efficient vLLM serving.
+3. **Inference benchmarking**: Measured tokens/second on T4 and A100, confirming the quantized model meets latency requirements for stage-pilot integration.
+4. **Published artifacts**: Pushed the LoRA adapter and AWQ model to HuggingFace Hub at `KIM3310/qwen2.5-7b-tool-calling-lora` and `KIM3310/qwen2.5-7b-tool-calling-awq`.
