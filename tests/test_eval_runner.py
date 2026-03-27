@@ -230,9 +230,7 @@ class TestEvaluate:
 
         examples = [_make_test_example() for _ in range(5)]
         # Mock backend always returns the correct tool call
-        backend = MockBackend(
-            [("", [{"name": "get_weather", "arguments": {"city": "Tokyo"}}])]
-        )
+        backend = MockBackend([("", [{"name": "get_weather", "arguments": {"city": "Tokyo"}}])])
         results = evaluate(backend, examples)
         assert results["categories"]["simple"]["correct"] == 5
         assert results["categories"]["simple"]["total"] == 5
@@ -277,10 +275,9 @@ class TestEvaluate:
     def test_multiple_categories(self) -> None:
         from tool_call_finetune_lab.eval.bfcl_runner import evaluate
 
-        examples = (
-            [_make_test_example(category="simple") for _ in range(3)]
-            + [_make_test_example(category="multiple") for _ in range(2)]
-        )
+        examples = [_make_test_example(category="simple") for _ in range(3)] + [
+            _make_test_example(category="multiple") for _ in range(2)
+        ]
         backend = MockBackend([("", [{"name": "get_weather", "arguments": {"city": "Tokyo"}}])])
         results = evaluate(backend, examples)
         assert "simple" in results["categories"]

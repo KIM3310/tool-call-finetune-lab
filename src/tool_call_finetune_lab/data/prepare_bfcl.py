@@ -66,7 +66,7 @@ def _download_jsonl(url: str) -> List[Dict[str, Any]]:
 def _fix_param_type(params: Dict[str, Any]) -> Dict[str, Any]:
     """Convert BFCL's 'type': 'dict' to standard JSON Schema 'type': 'object'."""
     if isinstance(params, dict):
-        result = {}
+        result: Dict[str, Any] = {}
         for k, v in params.items():
             if k == "type" and v == "dict":
                 result[k] = "object"
@@ -87,14 +87,16 @@ def _normalize_tools(functions_raw: List[Dict[str, Any]]) -> List[Dict[str, Any]
         if not isinstance(fn, dict) or "name" not in fn:
             continue
         params = _fix_param_type(fn.get("parameters", {}))
-        tools.append({
-            "type": "function",
-            "function": {
-                "name": fn["name"],
-                "description": fn.get("description", f"Function {fn['name']}"),
-                "parameters": params,
-            },
-        })
+        tools.append(
+            {
+                "type": "function",
+                "function": {
+                    "name": fn["name"],
+                    "description": fn.get("description", f"Function {fn['name']}"),
+                    "parameters": params,
+                },
+            }
+        )
     return tools
 
 
@@ -121,13 +123,15 @@ def _normalize_ground_truth(gt: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
                         arguments[arg_name] = val
                     else:
                         arguments[arg_name] = acceptable_values
-            tool_calls.append({
-                "type": "function",
-                "function": {
-                    "name": func_name,
-                    "arguments": json.dumps(arguments, ensure_ascii=False),
-                },
-            })
+            tool_calls.append(
+                {
+                    "type": "function",
+                    "function": {
+                        "name": func_name,
+                        "arguments": json.dumps(arguments, ensure_ascii=False),
+                    },
+                }
+            )
     return tool_calls
 
 
@@ -229,6 +233,7 @@ def download_and_convert(config: DataConfig) -> List[Dict[str, Any]]:
 
     if config.max_samples_bfcl and len(examples) > config.max_samples_bfcl:
         import random
+
         random.seed(config.seed)
         examples = random.sample(examples, config.max_samples_bfcl)
 

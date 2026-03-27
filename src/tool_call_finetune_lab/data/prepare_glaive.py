@@ -148,9 +148,7 @@ def _parse_glaive_conversation(row: Dict[str, Any]) -> Optional[Dict[str, Any]]:
             messages.append({"role": "tool", "content": content})
 
     # Filter: must have at least one user + one assistant with tool_calls
-    has_tool_call = any(
-        m.get("role") == "assistant" and m.get("tool_calls") for m in messages
-    )
+    has_tool_call = any(m.get("role") == "assistant" and m.get("tool_calls") for m in messages)
     has_user = any(m.get("role") == "user" for m in messages)
 
     if not has_tool_call or not has_user:

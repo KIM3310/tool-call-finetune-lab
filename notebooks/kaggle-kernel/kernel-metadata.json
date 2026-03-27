@@ -6,7 +6,7 @@
   "kernel_type": "notebook",
   "is_private": false,
   "enable_gpu": true,
-  "enable_internet": true,
+  "enable_internet": false,
   "competition_sources": [],
   "dataset_sources": [
     "doeonkim00/tool-call-finetune-data"

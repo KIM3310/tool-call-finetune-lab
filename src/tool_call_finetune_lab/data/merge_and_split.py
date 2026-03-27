@@ -150,9 +150,9 @@ def print_statistics(
     print("DATASET STATISTICS")
     print("=" * 60)
     print(f"Total examples (after dedup): {len(all_examples)}")
-    print(f"  Train: {len(train)} ({100*len(train)/max(1,len(all_examples)):.1f}%)")
-    print(f"  Val:   {len(val)} ({100*len(val)/max(1,len(all_examples)):.1f}%)")
-    print(f"  Test:  {len(test)} ({100*len(test)/max(1,len(all_examples)):.1f}%)")
+    print(f"  Train: {len(train)} ({100 * len(train) / max(1, len(all_examples)):.1f}%)")
+    print(f"  Val:   {len(val)} ({100 * len(val) / max(1, len(all_examples)):.1f}%)")
+    print(f"  Test:  {len(test)} ({100 * len(test) / max(1, len(all_examples)):.1f}%)")
     print()
 
     # Source breakdown
@@ -182,7 +182,9 @@ def print_statistics(
         for ex in all_examples
         if sum(1 for m in ex.get("messages", []) if m["role"] == "user") > 1
     )
-    print(f"Multi-turn examples: {multi_turn} ({100*multi_turn/max(1,len(all_examples)):.1f}%)")
+    print(
+        f"Multi-turn examples: {multi_turn} ({100 * multi_turn / max(1, len(all_examples)):.1f}%)"
+    )
     print("=" * 60 + "\n")
 
 
@@ -195,9 +197,7 @@ def main() -> None:
 
     all_examples = bfcl_examples + glaive_examples
     if not all_examples:
-        logger.error(
-            "No examples found. Run prepare_bfcl.py and prepare_glaive.py first."
-        )
+        logger.error("No examples found. Run prepare_bfcl.py and prepare_glaive.py first.")
         return
 
     # Deduplicate

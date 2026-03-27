@@ -131,7 +131,13 @@ class TestBFCLParser:
         row = {
             "id": "test_0",
             "question": [[{"role": "user", "content": "Get weather in NYC"}]],
-            "function": [{"name": "get_weather", "description": "Get weather", "parameters": {"type": "dict", "properties": {"location": {"type": "string"}}}}],
+            "function": [
+                {
+                    "name": "get_weather",
+                    "description": "Get weather",
+                    "parameters": {"type": "dict", "properties": {"location": {"type": "string"}}},
+                }
+            ],
         }
         answer = {"id": "test_0", "ground_truth": [{"get_weather": {"location": ["NYC"]}}]}
         ex = _build_example(row, answer, "simple")
@@ -145,7 +151,13 @@ class TestBFCLParser:
         row = {
             "id": "test_1",
             "question": [[{"role": "user", "content": "Get weather"}]],
-            "function": [{"name": "get_weather", "description": "Get weather", "parameters": {"type": "dict", "properties": {"loc": {"type": "string"}}}}],
+            "function": [
+                {
+                    "name": "get_weather",
+                    "description": "Get weather",
+                    "parameters": {"type": "dict", "properties": {"loc": {"type": "string"}}},
+                }
+            ],
         }
         answer = {"id": "test_1", "ground_truth": [{"get_weather": {"loc": ["SF"]}}]}
         ex = _build_example(row, answer, "simple")
@@ -158,7 +170,11 @@ class TestBFCLParser:
     def test_build_example_no_question_returns_none(self) -> None:
         from tool_call_finetune_lab.data.prepare_bfcl import _build_example
 
-        row = {"id": "x", "question": [[]], "function": [{"name": "f", "description": "d", "parameters": {}}]}
+        row = {
+            "id": "x",
+            "question": [[]],
+            "function": [{"name": "f", "description": "d", "parameters": {}}],
+        }
         answer = {"id": "x", "ground_truth": [{"f": {}}]}
         assert _build_example(row, answer, "simple") is None
 
@@ -257,7 +273,7 @@ class TestGlaiveParser:
         from tool_call_finetune_lab.data.prepare_glaive import _parse_system_block
 
         system = (
-            'You have access to the following functions:\n\n'
+            "You have access to the following functions:\n\n"
             '[{"type": "function", "function": {"name": "foo", "description": "bar",'
             ' "parameters": {"type": "object", "properties": {}}}}]'
         )
@@ -277,7 +293,9 @@ class TestGlaiveParser:
     def test_parse_tool_call_content(self) -> None:
         from tool_call_finetune_lab.data.prepare_glaive import _parse_tool_call_content
 
-        content = '<functioncall> {"name": "get_weather", "arguments": {"city": "Tokyo"}} </functioncall>'
+        content = (
+            '<functioncall> {"name": "get_weather", "arguments": {"city": "Tokyo"}} </functioncall>'
+        )
         result = _parse_tool_call_content(content)
         assert result is not None
         assert result["function"]["name"] == "get_weather"
@@ -289,8 +307,7 @@ class TestGlaiveParser:
         assert len(examples) >= 1
         for ex in examples:
             has_tc = any(
-                m.get("role") == "assistant" and m.get("tool_calls")
-                for m in ex["messages"]
+                m.get("role") == "assistant" and m.get("tool_calls") for m in ex["messages"]
             )
             assert has_tc
 
@@ -319,9 +336,7 @@ class TestMergeAndSplit:
         h2 = _content_hash(sample_examples[1])
         assert h1 != h2
 
-    def test_deduplicate_removes_duplicates(
-        self, sample_examples: List[Dict[str, Any]]
-    ) -> None:
+    def test_deduplicate_removes_duplicates(self, sample_examples: List[Dict[str, Any]]) -> None:
         from tool_call_finetune_lab.data.merge_and_split import deduplicate
 
         # Duplicate first example
@@ -329,9 +344,7 @@ class TestMergeAndSplit:
         result = deduplicate(duped)
         assert len(result) == len(sample_examples)
 
-    def test_deduplicate_preserves_unique(
-        self, sample_examples: List[Dict[str, Any]]
-    ) -> None:
+    def test_deduplicate_preserves_unique(self, sample_examples: List[Dict[str, Any]]) -> None:
         from tool_call_finetune_lab.data.merge_and_split import deduplicate
 
         result = deduplicate(sample_examples)
@@ -355,9 +368,7 @@ class TestMergeAndSplit:
         assert train_hashes.isdisjoint(test_hashes)
         assert val_hashes.isdisjoint(test_hashes)
 
-    def test_stratified_split_train_is_largest(
-        self, sample_examples: List[Dict[str, Any]]
-    ) -> None:
+    def test_stratified_split_train_is_largest(self, sample_examples: List[Dict[str, Any]]) -> None:
         from tool_call_finetune_lab.data.merge_and_split import stratified_split
 
         train, val, test = stratified_split(sample_examples, 0.8, 0.1, seed=42)

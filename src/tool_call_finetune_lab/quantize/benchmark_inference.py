@@ -147,9 +147,7 @@ async def run_concurrent_benchmark(
         async with semaphore:
             return await _single_request(client, model, prompt, max_tokens)
 
-    logger.info(
-        "Running %d requests with concurrency=%d...", n_requests, concurrency
-    )
+    logger.info("Running %d requests with concurrency=%d...", n_requests, concurrency)
     wall_start = time.perf_counter()
     tasks = [bounded_request(p) for p in prompts]
     raw_results = await asyncio.gather(*tasks)
@@ -255,9 +253,9 @@ def _print_result(result: Dict[str, Any]) -> None:
     print(f"  Wall time:       {result['wall_time_s']:.3f}s")
     print(f"  Requests/sec:    {result['requests_per_sec']:.2f}")
     print(f"  Tokens/sec:      {result['tokens_per_sec']:.1f}")
-    print(f"  Latency p50:     {result['latency_p50_s']*1000:.0f}ms")
-    print(f"  Latency p95:     {result['latency_p95_s']*1000:.0f}ms")
-    print(f"  Latency p99:     {result['latency_p99_s']*1000:.0f}ms")
+    print(f"  Latency p50:     {result['latency_p50_s'] * 1000:.0f}ms")
+    print(f"  Latency p95:     {result['latency_p95_s'] * 1000:.0f}ms")
+    print(f"  Latency p99:     {result['latency_p99_s'] * 1000:.0f}ms")
     print(f"  Avg output tok:  {result['avg_output_tokens']:.1f}")
 
 

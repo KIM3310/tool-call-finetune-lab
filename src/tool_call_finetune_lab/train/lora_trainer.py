@@ -184,9 +184,7 @@ def train(
     train_path = Path(data_cfg.train_file)
     val_path = Path(data_cfg.val_file)
     if not train_path.exists():
-        raise FileNotFoundError(
-            f"Training data not found: {train_path}. Run 'make data' first."
-        )
+        raise FileNotFoundError(f"Training data not found: {train_path}. Run 'make data' first.")
 
     model, tokenizer = build_model_and_tokenizer(model_config, lora_cfg)
 

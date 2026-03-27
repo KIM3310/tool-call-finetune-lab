@@ -26,7 +26,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Representative tool-calling test cases that mirror stage-pilot's use cases
-STAGE_PILOT_TEST_CASES = [
+STAGE_PILOT_TEST_CASES: List[Dict[str, Any]] = [
     {
         "name": "simple_single_tool",
         "messages": [
@@ -86,7 +86,10 @@ STAGE_PILOT_TEST_CASES = [
     {
         "name": "multi_tool_selection",
         "messages": [
-            {"role": "user", "content": "Search for 'machine learning' papers and then summarize the top result."}
+            {
+                "role": "user",
+                "content": "Search for 'machine learning' papers and then summarize the top result.",
+            }
         ],
         "tools": [
             {
@@ -125,9 +128,7 @@ STAGE_PILOT_TEST_CASES = [
     },
     {
         "name": "no_tool_needed",
-        "messages": [
-            {"role": "user", "content": "What is 2 + 2?"}
-        ],
+        "messages": [{"role": "user", "content": "What is 2 + 2?"}],
         "tools": [
             {
                 "type": "function",

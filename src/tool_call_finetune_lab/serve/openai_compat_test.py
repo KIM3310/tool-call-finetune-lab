@@ -283,7 +283,9 @@ def test_tool_argument_types(client: Any, model: str) -> Tuple[bool, str]:
         # Validate types
         issues: List[str] = []
         if not isinstance(args.get("minutes_from_now"), int):
-            issues.append(f"minutes_from_now should be int, got {type(args.get('minutes_from_now'))}")
+            issues.append(
+                f"minutes_from_now should be int, got {type(args.get('minutes_from_now'))}"
+            )
         if args.get("priority") and args["priority"] not in ("low", "medium", "high"):
             issues.append(f"Invalid priority: '{args['priority']}'")
 
@@ -340,7 +342,7 @@ def run_all_tests(
             result_ok, result_msg = fn()
             elapsed = time.perf_counter() - t0
             status = "PASS" if result_ok else "FAIL"
-            print(f"[{status}] {name}: {result_msg} ({elapsed*1000:.0f}ms)")
+            print(f"[{status}] {name}: {result_msg} ({elapsed * 1000:.0f}ms)")
             if result_ok:
                 passed += 1
             elif fail_fast:

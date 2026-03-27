@@ -64,16 +64,27 @@ def build_vllm_command(
         Command as a list of strings, ready for subprocess.
     """
     cmd = [
-        sys.executable, "-m", "vllm.entrypoints.openai.api_server",
-        "--model", model_path,
-        "--host", host,
-        "--port", str(port),
-        "--tensor-parallel-size", str(tensor_parallel),
-        "--max-model-len", str(max_model_len),
-        "--gpu-memory-utilization", str(gpu_memory_utilization),
-        "--dtype", dtype,
-        "--served-model-name", served_model_name,
-        "--max-num-seqs", str(max_num_seqs),
+        sys.executable,
+        "-m",
+        "vllm.entrypoints.openai.api_server",
+        "--model",
+        model_path,
+        "--host",
+        host,
+        "--port",
+        str(port),
+        "--tensor-parallel-size",
+        str(tensor_parallel),
+        "--max-model-len",
+        str(max_model_len),
+        "--gpu-memory-utilization",
+        str(gpu_memory_utilization),
+        "--dtype",
+        dtype,
+        "--served-model-name",
+        served_model_name,
+        "--max-num-seqs",
+        str(max_num_seqs),
     ]
 
     if quantization:
@@ -106,9 +117,7 @@ def _detect_quantization(model_path: str) -> Optional[str]:
             cfg_path = quant_config if quant_config.exists() else awq_meta
             with open(cfg_path) as f:
                 cfg = json.load(f)
-            if cfg.get("quant_type", "").lower() == "awq" or "w_bit" in cfg.get(
-                "quant_config", {}
-            ):
+            if cfg.get("quant_type", "").lower() == "awq" or "w_bit" in cfg.get("quant_config", {}):
                 return "awq"
         except Exception:
             return "awq"

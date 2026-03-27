@@ -100,9 +100,7 @@ def load_calibration_data(
             )
         except Exception:
             # Fallback: just use user messages concatenated
-            text = " ".join(
-                m.get("content", "") for m in messages if m.get("role") == "user"
-            )
+            text = " ".join(m.get("content", "") for m in messages if m.get("role") == "user")
 
         # Truncate to max_seq_len tokens
         token_ids = tokenizer.encode(text)

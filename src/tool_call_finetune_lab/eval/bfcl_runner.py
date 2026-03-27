@@ -158,9 +158,7 @@ class VLLMBackend:
             api_calls = [
                 {
                     "name": tc.function.name,
-                    "arguments": json.loads(tc.function.arguments)
-                    if tc.function.arguments
-                    else {},
+                    "arguments": json.loads(tc.function.arguments) if tc.function.arguments else {},
                 }
                 for tc in msg.tool_calls
             ]

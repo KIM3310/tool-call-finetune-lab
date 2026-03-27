@@ -7,7 +7,7 @@ name = "tool-call-finetune-lab"
 version = "0.1.0"
 description = "LoRA fine-tuning for tool-calling reliability, BFCL evaluation, and vLLM serving"
 license = {text = "Apache-2.0"}
-requires-python = ">=3.10"
+requires-python = ">=3.9"
 authors = [{name = "Doeon Kim", email = "ehdjs1351@gmail.com"}]
 dependencies = [
     "openai>=1.50.0",
@@ -46,7 +46,7 @@ where = ["src"]
 
 [tool.ruff]
 line-length = 100
-target-version = "py310"
+target-version = "py39"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP"]

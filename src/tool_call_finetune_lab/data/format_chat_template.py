@@ -114,7 +114,9 @@ def example_to_chatml(
             if tool_calls:
                 call_blocks = "\n".join(_tool_call_to_chatml(tc) for tc in tool_calls)
                 # Prepend any text content before tool calls
-                full_content = (content + "\n" + call_blocks).strip() if content.strip() else call_blocks
+                full_content = (
+                    (content + "\n" + call_blocks).strip() if content.strip() else call_blocks
+                )
                 parts.append(f"{IM_START}assistant\n{full_content}{IM_END}")
             else:
                 parts.append(f"{IM_START}assistant\n{content}{IM_END}")
