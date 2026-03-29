@@ -3,11 +3,11 @@
 Usage:
     python scripts/push_to_hub.py \
         --model-path outputs/merged-model \
-        --repo-id KIM3310/qwen2.5-7b-tool-call-lora
+        --repo-id KIM3310/qwen2.5-7b-tool-calling-lora
 
     python scripts/push_to_hub.py \
         --model-path outputs/awq-model \
-        --repo-id KIM3310/qwen2.5-7b-tool-call-awq \
+        --repo-id KIM3310/qwen2.5-7b-tool-calling-awq \
         --model-card-extra "AWQ INT4 quantized version."
 """
 
@@ -73,7 +73,7 @@ MODEL_CARD_TEMPLATE = dedent(
     - **Base model**: `Qwen/Qwen2.5-7B-Instruct`
     - **Method**: QLoRA (4-bit NF4), rank=16, alpha=32
     - **Data**: BFCL + Glaive-function-calling-v2
-    - **Epochs**: 3, lr=2e-4
+    - **Epochs**: 1, lr=2e-4
 
     ## Evaluation (BFCL)
 
@@ -174,7 +174,7 @@ def push_to_hub(
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Push model to HuggingFace Hub")
     parser.add_argument("--model-path", default="outputs/merged-model")
-    parser.add_argument("--repo-id", default="KIM3310/qwen2.5-7b-tool-call-lora")
+    parser.add_argument("--repo-id", default="KIM3310/qwen2.5-7b-tool-calling-lora")
     parser.add_argument("--private", action="store_true")
     parser.add_argument("--model-card-extra", default="")
     parser.add_argument(

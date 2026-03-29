@@ -1,0 +1,70 @@
+{
+  "artifact_type": "eval-harness-smoke",
+  "generated_on": "2026-03-29",
+  "note": "Synthetic evaluator smoke artifact. This validates scoring/output shape only and is not a model benchmark.",
+  "results": {
+    "categories": {
+      "multiple": {
+        "correct": 1,
+        "total": 2,
+        "accuracy": 50.0,
+        "avg_latency_s": 0.0
+      },
+      "parallel": {
+        "correct": 1,
+        "total": 1,
+        "accuracy": 100.0,
+        "avg_latency_s": 0.0
+      },
+      "simple": {
+        "correct": 1,
+        "total": 2,
+        "accuracy": 50.0,
+        "avg_latency_s": 0.0
+      },
+      "_overall": {
+        "correct": 3,
+        "total": 5,
+        "accuracy": 60.0
+      }
+    },
+    "failures": [
+      {
+        "index": 2,
+        "category": "multiple",
+        "expected": [
+          {
+            "name": "search_hotels",
+            "arguments": "{\"city\": \"Busan\"}"
+          }
+        ],
+        "predicted": [
+          {
+            "name": "search_flights",
+            "arguments": {
+              "destination": "Busan"
+            }
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "category": "simple",
+        "expected": [
+          {
+            "name": "get_weather",
+            "arguments": "{\"city\": \"London\"}"
+          }
+        ],
+        "predicted": [
+          {
+            "name": "get_weather",
+            "arguments": {
+              "city": "New York"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

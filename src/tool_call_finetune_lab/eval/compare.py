@@ -166,7 +166,7 @@ def generate_comparison_table(
             "## Notes",
             "",
             "- Base: `Qwen/Qwen2.5-7B-Instruct` without fine-tuning",
-            "- Fine-tuned: QLoRA rank=16 on BFCL + Glaive-v2, 3 epochs",
+            "- Fine-tuned: QLoRA rank=16 on BFCL + Glaive-v2, 1 epoch",
             "- GPT-4o-mini: OpenAI API reference (gpt-4o-mini-2024-07-18)",
             "- All accuracies are exact-match tool name + argument comparison",
             "",

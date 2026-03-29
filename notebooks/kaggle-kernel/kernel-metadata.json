@@ -4,11 +4,15 @@
   "code_file": "kaggle_full_pipeline.ipynb",
   "language": "python",
   "kernel_type": "notebook",
-  "is_private": true,
+  "is_private": false,
   "enable_gpu": true,
   "enable_internet": true,
   "competition_sources": [],
-  "dataset_sources": ["doeonkim00/tool-call-finetune-data"],
+  "dataset_sources": [
+    "doeonkim00/tool-call-finetune-data"
+  ],
   "kernel_sources": [],
-  "model_sources": ["qwen-lm/qwen2.5/transformers/7b-instruct/1"]
+  "model_sources": [
+    "qwen-lm/qwen2.5/transformers/7b-instruct/1"
+  ]
 }

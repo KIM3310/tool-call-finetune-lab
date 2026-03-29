@@ -1,0 +1,30 @@
+{
+  "generated_on": "2026-03-29",
+  "data_snapshot": {
+    "train_examples": 23716,
+    "val_examples": 2962,
+    "test_examples": 2969
+  },
+  "kaggle": {
+    "credential_file_present": true,
+    "username_matches_owner": true,
+    "dataset_status_probe": {
+      "status_code": 401,
+      "body_prefix": "{\"code\":401,\"message\":\"Unauthenticated\"}"
+    },
+    "kernel_page_probe": {
+      "url": "https://www.kaggle.com/code/doeonkim00/tool-call-fine-tune-lab-qlora-pipeline",
+      "status_code": 404
+    }
+  },
+  "hugging_face": {
+    "lora": {
+      "url": "https://huggingface.co/KIM3310/qwen2.5-7b-tool-calling-lora",
+      "status_code": 401
+    },
+    "awq": {
+      "url": "https://huggingface.co/KIM3310/qwen2.5-7b-tool-calling-awq",
+      "status_code": 401
+    }
+  }
+}

@@ -22,5 +22,11 @@ data/processed/
 .mypy_cache/
 .pytest_cache/
 results/
+!results/
+results/*
+!results/eval_harness_smoke.json
+!results/eval_harness_smoke.md
+!results/public_release_status.json
+!results/public_release_status.md
 *.log
 .DS_Store

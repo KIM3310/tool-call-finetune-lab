@@ -76,7 +76,7 @@ This trade-off is necessary on consumer and free-tier hardware. On an A100 80 GB
 
 ## 7. Post-Training Steps Completed
 
-1. **BFCL evaluation**: Ran the full eval suite against AST Simple, AST Multiple, and AST Parallel categories. The fine-tuned model achieved 80% overall accuracy, up from 65% on the base model. Full results are in `results/bfcl_results.json`.
+1. **BFCL evaluation path**: The repo contains the full BFCL runner and comparison path. The currently checked-in Kaggle notebook demonstrates a smaller first-100-example smoke eval, while the full strict artifact should be treated as pending until `results/bfcl_results.json` is republished.
 2. **AWQ quantization**: Quantized the merged model to INT4 with AWQ for efficient vLLM serving.
 3. **Inference benchmarking**: Measured tokens/second on T4 and A100, confirming the quantized model meets latency requirements for stage-pilot integration.
-4. **Published artifacts**: Pushed the LoRA adapter and AWQ model to HuggingFace Hub at `KIM3310/qwen2.5-7b-tool-calling-lora` and `KIM3310/qwen2.5-7b-tool-calling-awq`.
+4. **External artifact links**: Hugging Face and W&B references are tracked in the README, but their public accessibility should be reverified before using them as recruiter-facing proof.

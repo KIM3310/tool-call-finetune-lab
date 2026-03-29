@@ -1,6 +1,6 @@
-.PHONY: install data train eval quantize serve pipeline test lint format
+.PHONY: install data train eval quantize serve pipeline test lint format verify
 
-PYTHON ?= python3
+PYTHON ?= python3.11
 
 install:
 	$(PYTHON) -m pip install -e ".[dev]"
@@ -34,3 +34,6 @@ lint:
 
 format:
 	$(PYTHON) -m ruff format src/ tests/
+
+verify: test lint
+	@echo "Verification complete."
