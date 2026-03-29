@@ -14,12 +14,10 @@ Usage:
 from __future__ import annotations
 
 import argparse
-import json
 import logging
 import os
 from pathlib import Path
 from textwrap import dedent
-from typing import Optional
 
 logging.basicConfig(
     level=logging.INFO,
@@ -130,7 +128,7 @@ def push_to_hub(
 
     hf_token = os.environ.get("HF_TOKEN")
     if not hf_token:
-        raise EnvironmentError(
+        raise OSError(
             "HF_TOKEN environment variable is required for pushing to Hub. "
             "Set it in .env or export HF_TOKEN=your_token"
         )
@@ -164,7 +162,7 @@ def push_to_hub(
     logger.info("Upload complete: %s", model_url)
 
     # Print summary
-    print(f"\nModel pushed successfully!")
+    print("\nModel pushed successfully!")
     print(f"URL: {model_url}")
     print(f"Load with: AutoModelForCausalLM.from_pretrained('{repo_id}')")
 
