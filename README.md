@@ -35,13 +35,15 @@ We fine-tune an open model on real tool-calling data, validate against a recogni
 - Kaggle kernel metadata: [`notebooks/kaggle-kernel/kernel-metadata.json`](notebooks/kaggle-kernel/kernel-metadata.json)
 - public-sync helper: [`scripts/sync_kaggle_kernel.py`](scripts/sync_kaggle_kernel.py)
 
-The checked-in kernel metadata is now configured for a **public** kernel (`is_private: false`), the attached dataset page is public, and the Kaggle kernel metadata no longer depends on a Kaggle-hosted model attachment. A fresh Kaggle republish attempt succeeded on `2026-03-29`, and the public notebook page is now live. At the time of verification, the latest remote kernel execution status was still `RUNNING`, so runtime completion should be rechecked if you want a fully finished Kaggle run artifact.
+The checked-in kernel metadata is now configured for a **public** kernel (`is_private: false`), the attached dataset page is public, and the Kaggle kernel metadata no longer depends on a Kaggle-hosted model attachment. A fresh Kaggle republish attempt succeeded on `2026-03-29`, the public notebook page is live, and the latest remote kernel execution reached `COMPLETE` by taking the documented smoke fallback path on an unsupported accelerator.
 
 ## Current evidence
 
 - The repo contains a full QLoRA training pipeline, adapter merge path, BFCL runner, AWQ/vLLM path, and 108 local tests.
 - A fresh local data rebuild on 2026-03-29 reproduced the documented split: 23,716 train / 2,962 val / 2,969 test from 29,647 deduplicated examples.
+- The latest authenticated Kaggle push reached **kernel version 21** and the public remote run reached `COMPLETE` on `2026-03-29`.
 - The checked-in Kaggle notebook demonstrates a **first-100-example BFCL smoke eval with loose function-name matching**, not a full strict benchmark artifact.
+- On unsupported Kaggle accelerators, the notebook now completes via a smoke fallback that validates data loading, tokenizer setup, formatting, tokenization, and results emission without entering the incompatible 4-bit training path.
 - The repo now includes a checked-in evaluator smoke artifact and release-status ledger:
   - [`results/eval_harness_smoke.json`](results/eval_harness_smoke.json)
   - [`results/eval_harness_smoke.md`](results/eval_harness_smoke.md)
@@ -51,7 +53,7 @@ The checked-in kernel metadata is now configured for a **public** kernel (`is_pr
 
 ### Public-proof gaps still open
 
-- The public Kaggle notebook page is now live, but the latest remote execution was still `RUNNING` at verification time.
+- The public Kaggle notebook page is live and the latest remote execution completed, but that public completion used the smoke fallback path rather than a full QLoRA training run.
 - A Hugging Face token plus a reachable model directory is required before the LoRA or AWQ artifacts can become public links.
 - A full strict BFCL artifact remains pending until the fine-tuned model weights are available again for re-evaluation.
 
@@ -146,7 +148,7 @@ python scripts/sync_kaggle_kernel.py --public
 
 | Artifact | Link | Status |
 |----------|------|--------|
-| Kaggle kernel | [kaggle.com/code/doeonkim00/tool-call-fine-tune-lab-qlora-pipeline](https://www.kaggle.com/code/doeonkim00/tool-call-fine-tune-lab-qlora-pipeline) | Public page live on 2026-03-29; latest pushed version was still running at verification time |
+| Kaggle kernel | [kaggle.com/code/doeonkim00/tool-call-fine-tune-lab-qlora-pipeline](https://www.kaggle.com/code/doeonkim00/tool-call-fine-tune-lab-qlora-pipeline) | Public page live; kernel version 21 completed on 2026-03-29 via the documented smoke fallback path |
 | LoRA adapter | [huggingface.co/KIM3310/qwen2.5-7b-tool-calling-lora](https://huggingface.co/KIM3310/qwen2.5-7b-tool-calling-lora) | Not publicly reachable on 2026-03-29; push config is public-ready |
 | AWQ quantized | [huggingface.co/KIM3310/qwen2.5-7b-tool-calling-awq](https://huggingface.co/KIM3310/qwen2.5-7b-tool-calling-awq) | Not publicly reachable on 2026-03-29; push config is public-ready |
 | Eval harness smoke | [`results/eval_harness_smoke.json`](results/eval_harness_smoke.json) | Checked in |

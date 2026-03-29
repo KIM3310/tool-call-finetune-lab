@@ -17,9 +17,9 @@
     "latest_manual_publish_check": {
       "verified_on": "2026-03-29",
       "push_status": "succeeded",
-      "kernel_version": 19,
-      "kernel_runtime_status": "RUNNING",
-      "message": "The latest authenticated Kaggle push succeeded and the public notebook page is live; recheck Kaggle for final runtime completion."
+      "kernel_version": 21,
+      "kernel_runtime_status": "COMPLETE",
+      "message": "The latest authenticated Kaggle push succeeded, the public notebook page is live, and the remote kernel completed by taking the documented smoke fallback path on an unsupported accelerator."
     }
   },
   "hugging_face": {

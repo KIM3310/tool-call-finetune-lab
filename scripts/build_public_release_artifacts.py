@@ -125,9 +125,12 @@ def _probe_kaggle() -> dict[str, Any]:
         "latest_manual_publish_check": {
             "verified_on": TODAY,
             "push_status": "succeeded",
-            "kernel_version": 19,
-            "kernel_runtime_status": "RUNNING",
-            "message": "The latest authenticated Kaggle push succeeded and the public notebook page is live; recheck Kaggle for final runtime completion.",
+            "kernel_version": 21,
+            "kernel_runtime_status": "COMPLETE",
+            "message": (
+                "The latest authenticated Kaggle push succeeded, the public notebook page is live, "
+                "and the remote kernel completed by taking the documented smoke fallback path on an unsupported accelerator."
+            ),
         },
     }
 
@@ -196,7 +199,8 @@ def write_markdown(smoke: dict[str, Any], status: dict[str, Any]) -> None:
         "## Interpretation",
         "",
         "- The attached Kaggle dataset page is public and the Kaggle notebook page is now live.",
-        "- The latest authenticated Kaggle push succeeded, but the remote kernel runtime was still `RUNNING` at verification time.",
+        "- The latest authenticated Kaggle push succeeded, and the remote kernel reached `COMPLETE` on Kaggle.",
+        "- That successful public run used the smoke fallback path on an unsupported accelerator, so it proves public execution hygiene rather than full QLoRA benchmark output.",
         "- The Hugging Face artifact URLs are not publicly reachable from this environment right now.",
         "- A full `results/bfcl_results.json` still requires the actual fine-tuned weights to be available again.",
     ]

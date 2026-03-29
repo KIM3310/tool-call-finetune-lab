@@ -8,7 +8,7 @@
 - Public dataset page probe: `200`
 - Kernel page probe: `200`
 - Latest manual publish check: `succeeded`
-- Latest observed kernel runtime status: `RUNNING`
+- Latest observed kernel runtime status: `COMPLETE`
 
 ## Hugging Face
 
@@ -18,6 +18,7 @@
 ## Interpretation
 
 - The attached Kaggle dataset page is public and the Kaggle notebook page is now live.
-- The latest authenticated Kaggle push succeeded, but the remote kernel runtime was still `RUNNING` at verification time.
+- The latest authenticated Kaggle push succeeded, and the remote kernel reached `COMPLETE` on Kaggle.
+- That successful public run used the smoke fallback path on an unsupported accelerator, so it proves public execution hygiene rather than full QLoRA benchmark output.
 - The Hugging Face artifact URLs are not publicly reachable from this environment right now.
 - A full `results/bfcl_results.json` still requires the actual fine-tuned weights to be available again.
