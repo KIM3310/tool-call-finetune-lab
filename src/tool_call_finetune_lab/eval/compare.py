@@ -40,7 +40,8 @@ def _load_results(path: Optional[str]) -> Optional[Dict[str, Any]]:
     if not path or not Path(path).exists():
         return None
     with open(path, encoding="utf-8") as f:
-        return json.load(f)
+        data: Dict[str, Any] = json.load(f)
+        return data
 
 
 def _get_accuracy(results: Optional[Dict[str, Any]], category: str) -> str:

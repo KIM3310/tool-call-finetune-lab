@@ -84,7 +84,8 @@ def _normalize_arguments(args: Any) -> Dict[str, Any]:
     """Normalize tool call arguments to a dict for comparison."""
     if isinstance(args, str):
         try:
-            return json.loads(args)
+            parsed = json.loads(args)
+            return parsed if isinstance(parsed, dict) else {"_raw": parsed}
         except json.JSONDecodeError:
             return {"_raw": args}
     if isinstance(args, dict):
