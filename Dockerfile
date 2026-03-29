@@ -9,6 +9,7 @@
 ARG CUDA_VERSION=12.1.1
 ARG UBUNTU_VERSION=22.04
 ARG PYTHON_VERSION=3.11
+# NOTE: Requires Python 3.10+ (project uses modern type hints)
 
 # ---------------------------------------------------------------------------
 # Stage 1: base — CUDA + Python + common system deps

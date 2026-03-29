@@ -117,31 +117,74 @@ The fine-tuned model serves through vLLM's OpenAI-compatible endpoint, so stage-
 
 ## Quick Start
 
+### Installation
+
 ```bash
 # Clone and install (lightweight — GPU deps are optional extras)
 git clone https://github.com/KIM3310/tool-call-finetune-lab
 cd tool-call-finetune-lab
 pip install -e ".[dev]"
 
-# Prepare data (runs on any machine, no GPU needed)
-make data
-
-# Train on GPU machine
-pip install -e ".[gpu]"
-make train
-
-# Evaluate
-make eval
-
-# Quantize + serve
-make quantize
-make serve
+# Or with GPU dependencies for training/serving:
+pip install -e ".[gpu,dev]"
 ```
 
-Or run the full pipeline from the checked-in Kaggle notebook source:
+### Data Preparation (no GPU needed)
 
 ```bash
-python scripts/sync_kaggle_kernel.py --public
+make data
+```
+
+This downloads BFCL v4 from GitHub and Glaive v2 from HuggingFace, merges, deduplicates, and splits into train/val/test.
+
+### Training (requires GPU)
+
+```bash
+make train                  # QLoRA fine-tuning
+make merge                  # Merge LoRA adapter into base model
+```
+
+### Evaluation
+
+```bash
+make eval                   # Run BFCL evaluation + comparison table
+```
+
+### Quantization & Serving
+
+```bash
+make quantize               # AWQ INT4 quantization
+make serve                  # Launch vLLM server
+make smoke-test             # Smoke test the running server
+```
+
+### Full Pipeline
+
+```bash
+make pipeline               # data -> train -> merge -> eval -> quantize
+```
+
+### Docker Deployment
+
+```bash
+docker compose up vllm-server          # Serve the quantized model
+docker compose run smoke-test          # Run smoke tests
+```
+
+### Run on Kaggle
+
+Or run the full pipeline on Kaggle: [notebook link](https://www.kaggle.com/code/doeonkim00/tool-call-fine-tune-lab-qlora-pipeline)
+
+## Development
+
+```bash
+make check                  # Run all checks (lint + typecheck + test)
+make test                   # Unit tests only
+make test-cov               # Tests with coverage
+make lint                   # Ruff linter
+make format                 # Auto-format code
+make typecheck              # mypy type checking
+make help                   # Show all available commands
 ```
 
 ## Published Artifacts
@@ -168,9 +211,16 @@ src/tool_call_finetune_lab/
   serve/                 # vLLM launcher + OpenAI-compat smoke test
 notebooks/
   kaggle_full_pipeline.ipynb   # Self-contained Kaggle T4 notebook
-scripts/                # download base model, push to hub, full pipeline
-tests/                  # 108 tests covering data, config, eval harness
+scripts/                # download base model, push to hub
+tests/                  # Unit tests covering data, config, eval harness
 ```
+
+## Requirements
+
+- **Python 3.10+** (3.11 recommended)
+- **CPU-only** for data preparation, evaluation code review, and tests
+- **GPU (16+ GB VRAM)** for training (T4 minimum, A100 recommended)
+- **GPU (8+ GB VRAM)** for AWQ-quantized inference via vLLM
 
 ## Related Projects
 

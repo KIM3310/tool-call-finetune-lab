@@ -7,13 +7,10 @@ tool-call extraction, and result formatting without requiring a GPU.
 from __future__ import annotations
 
 import json
-import tempfile
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
-from unittest.mock import MagicMock, patch
 
 import pytest
-
 
 # ---------------------------------------------------------------------------
 # Tool-call extraction tests
@@ -384,7 +381,7 @@ class TestStagePilotBridge:
             "expected_args_subset": {"city": "Tokyo"},
         }
         calls = [{"name": "get_weather", "arguments": {"city": "Tokyo"}}]
-        passed, reason = _score_test_case(tc, calls)
+        passed, _reason = _score_test_case(tc, calls)
         assert passed is True
 
     def test_score_test_case_wrong_name(self) -> None:
@@ -400,7 +397,7 @@ class TestStagePilotBridge:
         from tool_call_finetune_lab.eval.stage_pilot_bridge import _score_test_case
 
         tc = {"name": "no_tool", "expected_tool_name": None}
-        passed, reason = _score_test_case(tc, None)
+        passed, _reason = _score_test_case(tc, None)
         assert passed is True
 
     def test_score_test_case_unexpected_tool_call(self) -> None:
@@ -408,7 +405,7 @@ class TestStagePilotBridge:
 
         tc = {"name": "no_tool", "expected_tool_name": None}
         calls = [{"name": "surprise_tool", "arguments": {}}]
-        passed, reason = _score_test_case(tc, calls)
+        passed, _reason = _score_test_case(tc, calls)
         assert passed is False
 
     def test_score_test_case_missing_arg(self) -> None:
@@ -433,7 +430,7 @@ class TestStagePilotBridge:
             "expected_args_subset": {"city": "Tokyo"},
         }
         calls = [{"name": "get_weather", "arguments": {"city": "London"}}]
-        passed, reason = _score_test_case(tc, calls)
+        passed, _reason = _score_test_case(tc, calls)
         assert passed is False
 
     def test_score_test_case_expected_count(self) -> None:
@@ -445,7 +442,7 @@ class TestStagePilotBridge:
             "expected_call_count": 2,
         }
         calls = [{"name": "get_weather", "arguments": {"city": "A"}}]  # Only 1
-        passed, reason = _score_test_case(tc, calls)
+        passed, _reason = _score_test_case(tc, calls)
         assert passed is False
 
     def test_score_test_case_enough_calls(self) -> None:
@@ -460,5 +457,5 @@ class TestStagePilotBridge:
             {"name": "get_weather", "arguments": {"city": "A"}},
             {"name": "get_weather", "arguments": {"city": "B"}},
         ]
-        passed, reason = _score_test_case(tc, calls)
+        passed, _reason = _score_test_case(tc, calls)
         assert passed is True

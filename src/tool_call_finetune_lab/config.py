@@ -5,7 +5,6 @@ from __future__ import annotations
 import os
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import List, Optional
 
 
 @dataclass
@@ -21,8 +20,11 @@ class ModelConfig:
     def __post_init__(self) -> None:
         if self.max_seq_length <= 0:
             raise ValueError(f"max_seq_length must be positive, got {self.max_seq_length}")
-        if self.torch_dtype not in ("float16", "bfloat16", "float32"):
-            raise ValueError(f"Unsupported torch_dtype: {self.torch_dtype}")
+        valid_dtypes = ("float16", "bfloat16", "float32")
+        if self.torch_dtype not in valid_dtypes:
+            raise ValueError(
+                f"Unsupported torch_dtype: {self.torch_dtype}. Must be one of {valid_dtypes}"
+            )
 
 
 @dataclass
@@ -32,7 +34,7 @@ class LoraConfig:
     rank: int = 16
     alpha: int = 32
     dropout: float = 0.05
-    target_modules: List[str] = field(
+    target_modules: list[str] = field(
         default_factory=lambda: ["q_proj", "k_proj", "v_proj", "o_proj"]
     )
     bias: str = "none"
@@ -79,6 +81,11 @@ class TrainingConfig:
         if self.lr <= 0:
             raise ValueError(f"learning rate must be positive, got {self.lr}")
 
+    @property
+    def effective_batch_size(self) -> int:
+        """Return the effective batch size (per_device * gradient_accumulation)."""
+        return self.batch_size * self.gradient_accumulation
+
 
 @dataclass
 class DataConfig:
@@ -97,8 +104,8 @@ class DataConfig:
     val_ratio: float = 0.1
     test_ratio: float = 0.1
     seed: int = 42
-    max_samples_bfcl: Optional[int] = None
-    max_samples_glaive: Optional[int] = None
+    max_samples_bfcl: int | None = None
+    max_samples_glaive: int | None = None
 
     def __post_init__(self) -> None:
         total = self.train_ratio + self.val_ratio + self.test_ratio
@@ -152,11 +159,11 @@ class EvalConfig:
         Path(self.results_dir).mkdir(parents=True, exist_ok=True)
 
 
-def get_hf_token() -> Optional[str]:
+def get_hf_token() -> str | None:
     """Retrieve HuggingFace token from environment."""
     return os.environ.get("HF_TOKEN")
 
 
-def get_wandb_key() -> Optional[str]:
+def get_wandb_key() -> str | None:
     """Retrieve W&B API key from environment."""
     return os.environ.get("WANDB_API_KEY")

@@ -168,7 +168,7 @@ class TestDataConfig:
     def test_invalid_ratios(self) -> None:
         from tool_call_finetune_lab.config import DataConfig
 
-        with pytest.raises(ValueError, match="must equal 1.0"):
+        with pytest.raises(ValueError, match=r"must equal 1\.0"):
             DataConfig(train_ratio=0.7, val_ratio=0.1, test_ratio=0.1)
 
     def test_custom_ratios_valid(self) -> None:

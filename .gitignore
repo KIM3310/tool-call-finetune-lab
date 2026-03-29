@@ -30,3 +30,10 @@ results/*
 !results/public_release_status.md
 *.log
 .DS_Store
+Thumbs.db
+.coverage
+htmlcov/
+.ipynb_checkpoints/
+*.swp
+*.swo
+*~

@@ -73,7 +73,7 @@ def run_gpt4o_mini_eval(
 
     from openai import OpenAI
 
-    from tool_call_finetune_lab.eval.bfcl_runner import VLLMBackend, evaluate, load_test_data
+    from tool_call_finetune_lab.eval.bfcl_runner import evaluate, load_test_data
 
     logger.info("Running GPT-4o-mini evaluation (max %d examples)...", max_examples)
 

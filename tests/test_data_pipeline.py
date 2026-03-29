@@ -7,13 +7,10 @@ they exercise parsing, formatting, deduplication, and splitting logic.
 from __future__ import annotations
 
 import json
-import os
-import tempfile
 from pathlib import Path
 from typing import Any, Dict, List
 
 import pytest
-
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -193,6 +190,17 @@ class TestBFCLParser:
         assert len(result) == 1
         assert result[0]["function"]["name"] == "get_weather"
 
+    def test_normalize_ground_truth_skips_empty_string(self) -> None:
+        """Regression test: empty string first value should use second value."""
+        from tool_call_finetune_lab.data.prepare_bfcl import _normalize_ground_truth
+
+        gt = [{"set_config": {"mode": ["", "auto"], "value": ["42"]}}]
+        result = _normalize_ground_truth(gt)
+        assert len(result) == 1
+        args = json.loads(result[0]["function"]["arguments"])
+        assert args["mode"] == "auto"  # Should skip "" and use "auto"
+        assert args["value"] == "42"
+
     def test_extract_user_content(self) -> None:
         from tool_call_finetune_lab.data.prepare_bfcl import _extract_user_content
 
@@ -277,7 +285,7 @@ class TestGlaiveParser:
             '[{"type": "function", "function": {"name": "foo", "description": "bar",'
             ' "parameters": {"type": "object", "properties": {}}}}]'
         )
-        prompt, tools = _parse_system_block(system)
+        _prompt, tools = _parse_system_block(system)
         assert len(tools) == 1
         assert tools[0]["function"]["name"] == "foo"
 

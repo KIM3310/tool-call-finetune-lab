@@ -18,7 +18,7 @@ import logging
 import statistics
 import time
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Tuple
 
 logging.basicConfig(
     level=logging.INFO,
@@ -99,9 +99,7 @@ async def _single_request(
     max_tokens: int = 256,
 ) -> Tuple[float, int, bool]:
     """Send one request and return (latency_s, output_tokens, success)."""
-    import asyncio
-
-    loop = asyncio.get_event_loop()
+    loop = asyncio.get_running_loop()
     t0 = time.perf_counter()
 
     try:
@@ -136,8 +134,6 @@ async def run_concurrent_benchmark(
 
     Returns a stats dict with latency percentiles and throughput.
     """
-    import asyncio
-
     prompts = BENCHMARK_PROMPTS * (n_requests // len(BENCHMARK_PROMPTS) + 1)
     prompts = prompts[:n_requests]
 

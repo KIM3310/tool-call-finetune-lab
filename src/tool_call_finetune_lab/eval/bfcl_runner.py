@@ -175,7 +175,7 @@ class LocalHFBackend:
 
     def __init__(self, model_path: str, max_seq_length: int = 4096) -> None:
         import torch
-        from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
+        from transformers import AutoModelForCausalLM, AutoTokenizer
 
         logger.info("Loading model from %s for local inference...", model_path)
         self.tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)

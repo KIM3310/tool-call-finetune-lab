@@ -19,7 +19,7 @@ import json
 import logging
 import sys
 import time
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, List, Tuple
 
 logging.basicConfig(
     level=logging.INFO,
@@ -309,7 +309,7 @@ def run_all_tests(
     """Run all smoke tests. Returns (passed, total)."""
     from openai import OpenAI
 
-    print(f"\nvLLM Endpoint Smoke Tests")
+    print("\nvLLM Endpoint Smoke Tests")
     print(f"URL:   {base_url}")
     print(f"Model: {model}")
     print("=" * 60)

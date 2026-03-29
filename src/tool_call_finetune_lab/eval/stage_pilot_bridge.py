@@ -238,9 +238,8 @@ def _score_test_case(
     if not tool_calls:
         return False, f"Expected tool '{expected_name}' but got no tool call"
 
-    if expected_count:
-        if len(tool_calls) < expected_count:
-            return False, f"Expected {expected_count} calls, got {len(tool_calls)}"
+    if expected_count and len(tool_calls) < expected_count:
+        return False, f"Expected {expected_count} calls, got {len(tool_calls)}"
 
     # Find a call matching the expected name
     matching = [c for c in tool_calls if c["name"] == expected_name]

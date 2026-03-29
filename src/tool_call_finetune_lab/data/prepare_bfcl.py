@@ -115,11 +115,10 @@ def _normalize_ground_truth(gt: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
             if isinstance(args, dict):
                 for arg_name, acceptable_values in args.items():
                     if isinstance(acceptable_values, list) and acceptable_values:
-                        # Take first acceptable value
+                        # Take first acceptable value, skipping empty strings
                         val = acceptable_values[0]
-                        # Skip empty string alternatives
                         if val == "" and len(acceptable_values) > 1:
-                            val = acceptable_values[0]
+                            val = acceptable_values[1]
                         arguments[arg_name] = val
                     else:
                         arguments[arg_name] = acceptable_values

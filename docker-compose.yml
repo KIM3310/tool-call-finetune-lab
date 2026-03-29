@@ -1,5 +1,3 @@
-version: "3.9"
-
 # docker-compose for tool-call-finetune-lab
 #
 # Services:

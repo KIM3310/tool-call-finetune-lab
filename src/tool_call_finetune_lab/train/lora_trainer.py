@@ -152,7 +152,7 @@ def train(
     Returns:
         Output directory path where adapter weights are saved.
     """
-    from transformers import TrainingArguments
+    from trl import SFTConfig as TrainingArguments
     from trl import SFTTrainer
 
     from tool_call_finetune_lab.config import (
@@ -202,6 +202,8 @@ def train(
     output_dir.mkdir(parents=True, exist_ok=True)
 
     training_args = TrainingArguments(
+        dataset_text_field="text",
+        max_seq_length=model_config.max_seq_length,
         output_dir=str(output_dir),
         num_train_epochs=training_cfg.epochs,
         per_device_train_batch_size=training_cfg.batch_size,
@@ -214,7 +216,7 @@ def train(
         logging_steps=training_cfg.logging_steps,
         save_steps=training_cfg.save_steps,
         eval_steps=training_cfg.eval_steps if eval_dataset else None,
-        evaluation_strategy="steps" if eval_dataset else "no",
+        eval_strategy="steps" if eval_dataset else "no",
         save_total_limit=training_cfg.save_total_limit,
         load_best_model_at_end=training_cfg.load_best_model_at_end if eval_dataset else False,
         report_to=training_cfg.report_to,
@@ -223,6 +225,7 @@ def train(
         optim=training_cfg.optim,
         max_grad_norm=training_cfg.max_grad_norm,
         gradient_checkpointing=True,
+        gradient_checkpointing_kwargs={"use_reentrant": False},
         group_by_length=True,
     )
 
@@ -231,9 +234,7 @@ def train(
         args=training_args,
         train_dataset=train_dataset,
         eval_dataset=eval_dataset,
-        tokenizer=tokenizer,
-        dataset_text_field="text",
-        max_seq_length=model_config.max_seq_length,
+        processing_class=tokenizer,
         packing=False,
     )
 
