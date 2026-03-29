@@ -122,10 +122,12 @@ def _probe_kaggle() -> dict[str, Any]:
     return {
         "public_dataset_page_probe": dataset_page,
         "kernel_page_probe": kernel_page,
-        "last_authenticated_public_save_attempt": {
+        "latest_manual_publish_check": {
             "verified_on": TODAY,
-            "status_code": 403,
-            "message": "Phone verification is required to make a notebook public.",
+            "push_status": "succeeded",
+            "kernel_version": 19,
+            "kernel_runtime_status": "RUNNING",
+            "message": "The latest authenticated Kaggle push succeeded and the public notebook page is live; recheck Kaggle for final runtime completion.",
         },
     }
 
@@ -183,7 +185,8 @@ def write_markdown(smoke: dict[str, Any], status: dict[str, Any]) -> None:
         "",
         f"- Public dataset page probe: `{kaggle.get('public_dataset_page_probe', {}).get('status_code', 'n/a')}`",
         f"- Kernel page probe: `{kaggle.get('kernel_page_probe', {}).get('status_code', 'n/a')}`",
-        f"- Last authenticated public save attempt: `{kaggle.get('last_authenticated_public_save_attempt', {}).get('status_code', 'n/a')}`",
+        f"- Latest manual publish check: `{kaggle.get('latest_manual_publish_check', {}).get('push_status', 'n/a')}`",
+        f"- Latest observed kernel runtime status: `{kaggle.get('latest_manual_publish_check', {}).get('kernel_runtime_status', 'n/a')}`",
         "",
         "## Hugging Face",
         "",
@@ -192,8 +195,8 @@ def write_markdown(smoke: dict[str, Any], status: dict[str, Any]) -> None:
         "",
         "## Interpretation",
         "",
-        "- The attached Kaggle dataset page is public, but the notebook page is still unavailable.",
-        "- The latest authenticated Kaggle save attempt failed with: `Phone verification is required to make a notebook public.`",
+        "- The attached Kaggle dataset page is public and the Kaggle notebook page is now live.",
+        "- The latest authenticated Kaggle push succeeded, but the remote kernel runtime was still `RUNNING` at verification time.",
         "- The Hugging Face artifact URLs are not publicly reachable from this environment right now.",
         "- A full `results/bfcl_results.json` still requires the actual fine-tuned weights to be available again.",
     ]

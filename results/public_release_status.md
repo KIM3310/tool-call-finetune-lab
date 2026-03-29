@@ -6,8 +6,9 @@
 ## Kaggle
 
 - Public dataset page probe: `200`
-- Kernel page probe: `404`
-- Last authenticated public save attempt: `403`
+- Kernel page probe: `200`
+- Latest manual publish check: `succeeded`
+- Latest observed kernel runtime status: `RUNNING`
 
 ## Hugging Face
 
@@ -16,7 +17,7 @@
 
 ## Interpretation
 
-- The attached Kaggle dataset page is public, but the notebook page is still unavailable.
-- The latest authenticated Kaggle save attempt failed with: `Phone verification is required to make a notebook public.`
+- The attached Kaggle dataset page is public and the Kaggle notebook page is now live.
+- The latest authenticated Kaggle push succeeded, but the remote kernel runtime was still `RUNNING` at verification time.
 - The Hugging Face artifact URLs are not publicly reachable from this environment right now.
 - A full `results/bfcl_results.json` still requires the actual fine-tuned weights to be available again.
