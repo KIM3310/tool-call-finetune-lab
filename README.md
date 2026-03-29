@@ -44,6 +44,8 @@ The checked-in kernel metadata is now configured for a **public** kernel (`is_pr
 - The latest authenticated Kaggle push reached **kernel version 21** and the public remote run reached `COMPLETE` on `2026-03-29`.
 - The checked-in Kaggle notebook demonstrates a **first-100-example BFCL smoke eval with loose function-name matching**, not a full strict benchmark artifact.
 - On unsupported Kaggle accelerators, the notebook now completes via a smoke fallback that validates data loading, tokenizer setup, formatting, tokenization, and results emission without entering the incompatible 4-bit training path.
+- The repo now mirrors the completed public Kaggle smoke output:
+  - [`results/kaggle_public_smoke_bfcl_results.json`](results/kaggle_public_smoke_bfcl_results.json)
 - The repo now includes a checked-in evaluator smoke artifact and release-status ledger:
   - [`results/eval_harness_smoke.json`](results/eval_harness_smoke.json)
   - [`results/eval_harness_smoke.md`](results/eval_harness_smoke.md)
@@ -192,6 +194,7 @@ make help                   # Show all available commands
 | Artifact | Link | Status |
 |----------|------|--------|
 | Kaggle kernel | [kaggle.com/code/doeonkim00/tool-call-fine-tune-lab-qlora-pipeline](https://www.kaggle.com/code/doeonkim00/tool-call-fine-tune-lab-qlora-pipeline) | Public page live; kernel version 21 completed on 2026-03-29 via the documented smoke fallback path |
+| Kaggle smoke result mirror | [`results/kaggle_public_smoke_bfcl_results.json`](results/kaggle_public_smoke_bfcl_results.json) | Checked in from the completed public Kaggle run; smoke-only fallback artifact, not a full benchmark |
 | LoRA adapter | [huggingface.co/KIM3310/qwen2.5-7b-tool-calling-lora](https://huggingface.co/KIM3310/qwen2.5-7b-tool-calling-lora) | Not publicly reachable on 2026-03-29; push config is public-ready |
 | AWQ quantized | [huggingface.co/KIM3310/qwen2.5-7b-tool-calling-awq](https://huggingface.co/KIM3310/qwen2.5-7b-tool-calling-awq) | Not publicly reachable on 2026-03-29; push config is public-ready |
 | Eval harness smoke | [`results/eval_harness_smoke.json`](results/eval_harness_smoke.json) | Checked in |

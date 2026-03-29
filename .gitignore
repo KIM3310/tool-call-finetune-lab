@@ -26,6 +26,7 @@ results/
 results/*
 !results/eval_harness_smoke.json
 !results/eval_harness_smoke.md
+!results/kaggle_public_smoke_bfcl_results.json
 !results/public_release_status.json
 !results/public_release_status.md
 *.log
