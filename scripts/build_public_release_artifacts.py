@@ -119,6 +119,19 @@ def _probe_url(url: str) -> dict[str, Any]:
 def _probe_kaggle() -> dict[str, Any]:
     dataset_page = _probe_url("https://www.kaggle.com/datasets/doeonkim00/tool-call-finetune-data")
     kernel_page = _probe_url("https://www.kaggle.com/code/doeonkim00/tool-call-fine-tune-lab-qlora-pipeline")
+    mirrored_result = RESULTS_DIR / "kaggle_public_smoke_bfcl_results.json"
+    mirrored_summary: dict[str, Any] | None = None
+    if mirrored_result.exists():
+        try:
+            mirrored_payload = json.loads(mirrored_result.read_text(encoding="utf-8"))
+            mirrored_summary = {
+                "path": str(mirrored_result.relative_to(ROOT)),
+                "mode": mirrored_payload.get("mode"),
+                "reason": mirrored_payload.get("reason"),
+                "runtime": mirrored_payload.get("runtime"),
+            }
+        except Exception:  # pragma: no cover - checked-in artifact best effort
+            mirrored_summary = {"path": str(mirrored_result.relative_to(ROOT))}
     return {
         "public_dataset_page_probe": dataset_page,
         "kernel_page_probe": kernel_page,
@@ -132,6 +145,7 @@ def _probe_kaggle() -> dict[str, Any]:
                 "and the remote kernel completed by taking the documented smoke fallback path on an unsupported accelerator."
             ),
         },
+        "checked_in_public_smoke_result": mirrored_summary,
     }
 
 
@@ -190,6 +204,7 @@ def write_markdown(smoke: dict[str, Any], status: dict[str, Any]) -> None:
         f"- Kernel page probe: `{kaggle.get('kernel_page_probe', {}).get('status_code', 'n/a')}`",
         f"- Latest manual publish check: `{kaggle.get('latest_manual_publish_check', {}).get('push_status', 'n/a')}`",
         f"- Latest observed kernel runtime status: `{kaggle.get('latest_manual_publish_check', {}).get('kernel_runtime_status', 'n/a')}`",
+        f"- Checked-in Kaggle smoke result mirror: `{kaggle.get('checked_in_public_smoke_result', {}).get('path', 'n/a')}`",
         "",
         "## Hugging Face",
         "",
@@ -201,6 +216,7 @@ def write_markdown(smoke: dict[str, Any], status: dict[str, Any]) -> None:
         "- The attached Kaggle dataset page is public and the Kaggle notebook page is now live.",
         "- The latest authenticated Kaggle push succeeded, and the remote kernel reached `COMPLETE` on Kaggle.",
         "- That successful public run used the smoke fallback path on an unsupported accelerator, so it proves public execution hygiene rather than full QLoRA benchmark output.",
+        "- The repo now mirrors the completed public Kaggle smoke result as a checked-in JSON artifact for durable recruiter-facing proof.",
         "- The Hugging Face artifact URLs are not publicly reachable from this environment right now.",
         "- A full `results/bfcl_results.json` still requires the actual fine-tuned weights to be available again.",
     ]

@@ -76,7 +76,7 @@ This trade-off is necessary on consumer and free-tier hardware. On an A100 80 GB
 
 ## 7. Post-Training Steps Completed
 
-1. **BFCL evaluation path**: The repo contains the full BFCL runner and comparison path. The currently checked-in Kaggle notebook demonstrates a smaller first-100-example smoke eval, while the full strict artifact should be treated as pending until `results/bfcl_results.json` is republished.
+1. **BFCL evaluation path**: The repo contains the full BFCL runner and comparison path. The currently checked-in Kaggle notebook demonstrates a smaller first-100-example smoke eval, and the completed public Kaggle run now has a mirrored smoke artifact at `results/kaggle_public_smoke_bfcl_results.json`. The full strict artifact should still be treated as pending until `results/bfcl_results.json` is republished with actual fine-tuned weights.
 2. **AWQ quantization**: Quantized the merged model to INT4 with AWQ for efficient vLLM serving.
 3. **Inference benchmarking**: Measured tokens/second on T4 and A100, confirming the quantized model meets latency requirements for stage-pilot integration.
 4. **External artifact links**: Hugging Face and W&B references are tracked in the README, but their public accessibility should be reverified before using them as recruiter-facing proof.
