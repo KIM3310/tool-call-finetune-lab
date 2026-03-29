@@ -6,15 +6,18 @@
     "test_examples": 2969
   },
   "kaggle": {
-    "credential_file_present": true,
-    "username_matches_owner": true,
-    "dataset_status_probe": {
-      "status_code": 401,
-      "body_prefix": "{\"code\":401,\"message\":\"Unauthenticated\"}"
+    "public_dataset_page_probe": {
+      "url": "https://www.kaggle.com/datasets/doeonkim00/tool-call-finetune-data",
+      "status_code": 200
     },
     "kernel_page_probe": {
       "url": "https://www.kaggle.com/code/doeonkim00/tool-call-fine-tune-lab-qlora-pipeline",
       "status_code": 404
+    },
+    "last_authenticated_public_save_attempt": {
+      "verified_on": "2026-03-29",
+      "status_code": 403,
+      "message": "Phone verification is required to make a notebook public."
     }
   },
   "hugging_face": {

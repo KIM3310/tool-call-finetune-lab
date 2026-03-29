@@ -35,7 +35,7 @@ We fine-tune an open model on real tool-calling data, validate against a recogni
 - Kaggle kernel metadata: [`notebooks/kaggle-kernel/kernel-metadata.json`](notebooks/kaggle-kernel/kernel-metadata.json)
 - public-sync helper: [`scripts/sync_kaggle_kernel.py`](scripts/sync_kaggle_kernel.py)
 
-The checked-in kernel metadata is now configured for a **public** kernel (`is_private: false`). A live Kaggle republish attempt from this machine is still blocked because the local Kaggle API credential is rejected by Kaggle with `401 Unauthenticated`, so the old public Kaggle URL should still be treated as unavailable until a fresh key is used.
+The checked-in kernel metadata is now configured for a **public** kernel (`is_private: false`), the attached dataset page is now public, and the Kaggle kernel metadata no longer depends on a Kaggle-hosted model attachment. A live Kaggle republish attempt from this machine still cannot make the notebook public because Kaggle returns `Phone verification is required to make a notebook public.`, so the old public kernel URL should still be treated as unavailable until the account-level verification step is completed.
 
 ## Current evidence
 
@@ -51,7 +51,7 @@ The checked-in kernel metadata is now configured for a **public** kernel (`is_pr
 
 ### Public-proof gaps still open
 
-- A new Kaggle API key is required before this machine can push the public kernel.
+- The attached Kaggle dataset is now public, but Kaggle still blocks public notebook saves until phone verification is completed on the account.
 - A Hugging Face token plus a reachable model directory is required before the LoRA or AWQ artifacts can become public links.
 - A full strict BFCL artifact remains pending until the fine-tuned model weights are available again for re-evaluation.
 
@@ -146,7 +146,7 @@ python scripts/sync_kaggle_kernel.py --public
 
 | Artifact | Link | Status |
 |----------|------|--------|
-| Kaggle kernel | [kaggle.com/code/doeonkim00/tool-call-fine-tune-lab-qlora-pipeline](https://www.kaggle.com/code/doeonkim00/tool-call-fine-tune-lab-qlora-pipeline) | Remote URL currently unavailable; local kernel metadata is public-ready |
+| Kaggle kernel | [kaggle.com/code/doeonkim00/tool-call-fine-tune-lab-qlora-pipeline](https://www.kaggle.com/code/doeonkim00/tool-call-fine-tune-lab-qlora-pipeline) | Remote URL still unavailable on 2026-03-29 because Kaggle requires phone verification before the notebook can be made public |
 | LoRA adapter | [huggingface.co/KIM3310/qwen2.5-7b-tool-calling-lora](https://huggingface.co/KIM3310/qwen2.5-7b-tool-calling-lora) | Not publicly reachable on 2026-03-29; push config is public-ready |
 | AWQ quantized | [huggingface.co/KIM3310/qwen2.5-7b-tool-calling-awq](https://huggingface.co/KIM3310/qwen2.5-7b-tool-calling-awq) | Not publicly reachable on 2026-03-29; push config is public-ready |
 | Eval harness smoke | [`results/eval_harness_smoke.json`](results/eval_harness_smoke.json) | Checked in |

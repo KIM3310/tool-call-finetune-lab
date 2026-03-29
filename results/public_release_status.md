@@ -5,10 +5,9 @@
 
 ## Kaggle
 
-- Credential file present: `True`
-- Username matches owner: `True`
-- Dataset status probe: `401`
+- Public dataset page probe: `200`
 - Kernel page probe: `404`
+- Last authenticated public save attempt: `403`
 
 ## Hugging Face
 
@@ -17,6 +16,7 @@
 
 ## Interpretation
 
-- The local repo is configured for a public Kaggle kernel, but the current Kaggle API credential is rejected remotely.
+- The attached Kaggle dataset page is public, but the notebook page is still unavailable.
+- The latest authenticated Kaggle save attempt failed with: `Phone verification is required to make a notebook public.`
 - The Hugging Face artifact URLs are not publicly reachable from this environment right now.
 - A full `results/bfcl_results.json` still requires the actual fine-tuned weights to be available again.

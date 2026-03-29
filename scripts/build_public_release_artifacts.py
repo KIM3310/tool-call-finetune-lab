@@ -117,29 +117,16 @@ def _probe_url(url: str) -> dict[str, Any]:
 
 
 def _probe_kaggle() -> dict[str, Any]:
-    kaggle_json = Path.home() / ".kaggle" / "kaggle.json"
-    if not kaggle_json.exists():
-        return {"credential_file_present": False}
-
-    creds = json.loads(kaggle_json.read_text(encoding="utf-8"))
-    auth = (creds.get("username", ""), creds.get("key", ""))
-
-    dataset_url = "https://www.kaggle.com/api/v1/datasets/status/doeonkim00/tool-call-finetune-data"
-    try:
-        dataset_response = requests.get(dataset_url, auth=auth, timeout=20)
-        dataset_probe = {
-            "status_code": dataset_response.status_code,
-            "body_prefix": dataset_response.text[:160],
-        }
-    except Exception as exc:  # pragma: no cover - network best effort
-        dataset_probe = {"error": f"{type(exc).__name__}: {exc}"}
-
+    dataset_page = _probe_url("https://www.kaggle.com/datasets/doeonkim00/tool-call-finetune-data")
     kernel_page = _probe_url("https://www.kaggle.com/code/doeonkim00/tool-call-fine-tune-lab-qlora-pipeline")
     return {
-        "credential_file_present": True,
-        "username_matches_owner": creds.get("username") == "doeonkim00",
-        "dataset_status_probe": dataset_probe,
+        "public_dataset_page_probe": dataset_page,
         "kernel_page_probe": kernel_page,
+        "last_authenticated_public_save_attempt": {
+            "verified_on": TODAY,
+            "status_code": 403,
+            "message": "Phone verification is required to make a notebook public.",
+        },
     }
 
 
@@ -194,10 +181,9 @@ def write_markdown(smoke: dict[str, Any], status: dict[str, Any]) -> None:
         "",
         "## Kaggle",
         "",
-        f"- Credential file present: `{kaggle.get('credential_file_present', False)}`",
-        f"- Username matches owner: `{kaggle.get('username_matches_owner', False)}`",
-        f"- Dataset status probe: `{kaggle.get('dataset_status_probe', {}).get('status_code', 'n/a')}`",
+        f"- Public dataset page probe: `{kaggle.get('public_dataset_page_probe', {}).get('status_code', 'n/a')}`",
         f"- Kernel page probe: `{kaggle.get('kernel_page_probe', {}).get('status_code', 'n/a')}`",
+        f"- Last authenticated public save attempt: `{kaggle.get('last_authenticated_public_save_attempt', {}).get('status_code', 'n/a')}`",
         "",
         "## Hugging Face",
         "",
@@ -206,7 +192,8 @@ def write_markdown(smoke: dict[str, Any], status: dict[str, Any]) -> None:
         "",
         "## Interpretation",
         "",
-        "- The local repo is configured for a public Kaggle kernel, but the current Kaggle API credential is rejected remotely.",
+        "- The attached Kaggle dataset page is public, but the notebook page is still unavailable.",
+        "- The latest authenticated Kaggle save attempt failed with: `Phone verification is required to make a notebook public.`",
         "- The Hugging Face artifact URLs are not publicly reachable from this environment right now.",
         "- A full `results/bfcl_results.json` still requires the actual fine-tuned weights to be available again.",
     ]
