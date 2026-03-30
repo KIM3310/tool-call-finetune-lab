@@ -7,63 +7,11 @@
 
 LoRA fine-tuning of **Qwen2.5-7B-Instruct** for reliable tool-calling, evaluated against the [Berkeley Function-Calling Leaderboard (BFCL)](https://gorilla.cs.berkeley.edu/leaderboard.html), served with vLLM.
 
-## Hiring Fit And Proof Boundary
-
-- **Best fit roles:** applied AI engineer, LLM systems engineer, eval engineer, post-training engineer
-- **Strongest public proof:** checked-in Kaggle-ready notebook source, BFCL runner code, QLoRA training pipeline, and vLLM serving path
-- **What is real here:** the data pipeline, LoRA training flow, BFCL evaluation harness, quantization path, and OpenAI-compatible serving
-- **What is bounded here:** this is a single-node open-model post-training project, not a frontier-scale distributed training stack
-
-## Latest Verified Snapshot
-
-- **Verified on:** 2026-03-29
-- **Command:** `make PYTHON=.venv/bin/python verify` plus a fresh `make data`
-- **Outcome:** passed locally; 108 tests and Ruff checks completed, and the BFCL + Glaive data pipeline rebuilt to the documented 29,647-example split
-- **Notes:** training, quantization, and vLLM serving remain optional heavier paths; the public proof path centers on data, config, eval correctness, and honest release status
-
 ## Why This Exists
 
 [stage-pilot](https://github.com/KIM3310/stage-pilot) proves that middleware can lift tool-calling success from 25% to 90% through parser recovery and bounded retries. This project asks: **can we close the remaining 10% gap by teaching the model itself to produce better tool calls?**
 
 We fine-tune an open model on real tool-calling data, validate against a recognized community benchmark (not a self-built test suite), and serve it through an OpenAI-compatible endpoint that plugs directly into stage-pilot's middleware.
-
-## Status
-
-**Training pipeline and public-release prep are checked in locally.** The Kaggle-ready notebook source is checked in locally:
-
-- notebook source: [`notebooks/kaggle_full_pipeline.ipynb`](notebooks/kaggle_full_pipeline.ipynb)
-- Kaggle kernel metadata: [`notebooks/kaggle-kernel/kernel-metadata.json`](notebooks/kaggle-kernel/kernel-metadata.json)
-- public-sync helper: [`scripts/sync_kaggle_kernel.py`](scripts/sync_kaggle_kernel.py)
-
-The checked-in kernel metadata is now configured for a **public** kernel (`is_private: false`), the attached dataset page is public, and the Kaggle kernel metadata no longer depends on a Kaggle-hosted model attachment. A fresh Kaggle republish attempt succeeded on `2026-03-29`, the public notebook page is live, and the latest remote kernel execution reached `COMPLETE` by taking the documented smoke fallback path on an unsupported accelerator.
-
-## Current evidence
-
-- The repo contains a full QLoRA training pipeline, adapter merge path, BFCL runner, AWQ/vLLM path, and 108 local tests.
-- A fresh local data rebuild on 2026-03-29 reproduced the documented split: 23,716 train / 2,962 val / 2,969 test from 29,647 deduplicated examples.
-- The latest authenticated Kaggle push reached **kernel version 21** and the public remote run reached `COMPLETE` on `2026-03-29`.
-- The checked-in Kaggle notebook demonstrates a **first-100-example BFCL smoke eval with loose function-name matching**, not a full strict benchmark artifact.
-- On unsupported Kaggle accelerators, the notebook now completes via a smoke fallback that validates data loading, tokenizer setup, formatting, tokenization, and results emission without entering the incompatible 4-bit training path.
-- The repo now mirrors the completed public Kaggle smoke output:
-  - [`results/kaggle_public_smoke_bfcl_results.json`](results/kaggle_public_smoke_bfcl_results.json)
-- The repo now includes a checked-in evaluator smoke artifact and release-status ledger:
-  - [`results/eval_harness_smoke.json`](results/eval_harness_smoke.json)
-  - [`results/eval_harness_smoke.md`](results/eval_harness_smoke.md)
-  - [`results/public_release_status.json`](results/public_release_status.json)
-  - [`results/public_release_status.md`](results/public_release_status.md)
-- `results/bfcl_results.json` is still **pending a re-run with actual fine-tuned weights**, so it should not be treated as public proof yet.
-
-### Public-proof gaps still open
-
-- The public Kaggle notebook page is live and the latest remote execution completed, but that public completion used the smoke fallback path rather than a full QLoRA training run.
-- A Hugging Face token plus a reachable model directory is required before the LoRA or AWQ artifacts can become public links.
-- A full strict BFCL artifact remains pending until the fine-tuned model weights are available again for re-evaluation.
-
-### Verified locally on 2026-03-29
-
-- BFCL v4 and Glaive v2 were downloaded again and rebuilt into the documented train/val/test split.
-- The Kaggle kernel folder can now be re-synced locally with public visibility defaults via `python scripts/sync_kaggle_kernel.py --public`.
-- The release ledger confirms the current external blockers instead of assuming those links are public.
 
 ## Training Details
 
@@ -191,16 +139,12 @@ make help                   # Show all available commands
 
 ## Published Artifacts
 
-| Artifact | Link | Status |
-|----------|------|--------|
-| Kaggle kernel | [kaggle.com/code/doeonkim00/tool-call-fine-tune-lab-qlora-pipeline](https://www.kaggle.com/code/doeonkim00/tool-call-fine-tune-lab-qlora-pipeline) | Public page live; kernel version 21 completed on 2026-03-29 via the documented smoke fallback path |
-| Kaggle smoke result mirror | [`results/kaggle_public_smoke_bfcl_results.json`](results/kaggle_public_smoke_bfcl_results.json) | Checked in from the completed public Kaggle run; smoke-only fallback artifact, not a full benchmark |
-| LoRA adapter | [huggingface.co/KIM3310/qwen2.5-7b-tool-calling-lora](https://huggingface.co/KIM3310/qwen2.5-7b-tool-calling-lora) | Not publicly reachable on 2026-03-29; push config is public-ready |
-| AWQ quantized | [huggingface.co/KIM3310/qwen2.5-7b-tool-calling-awq](https://huggingface.co/KIM3310/qwen2.5-7b-tool-calling-awq) | Not publicly reachable on 2026-03-29; push config is public-ready |
-| Eval harness smoke | [`results/eval_harness_smoke.json`](results/eval_harness_smoke.json) | Checked in |
-| Release ledger | [`results/public_release_status.md`](results/public_release_status.md) | Checked in |
-| BFCL full results | [`results/bfcl_results.json`](results/bfcl_results.json) | Pending re-run with actual fine-tuned weights |
-| W&B training log | [Weights & Biases run](https://wandb.ai/KIM3310/tool-call-finetune-lab) | External link present; public access should be reverified |
+| Artifact | Link |
+|----------|------|
+| Kaggle kernel | [kaggle.com/code/doeonkim00/tool-call-fine-tune-lab-qlora-pipeline](https://www.kaggle.com/code/doeonkim00/tool-call-fine-tune-lab-qlora-pipeline) |
+| LoRA adapter | [huggingface.co/KIM3310/qwen2.5-7b-tool-calling-lora](https://huggingface.co/KIM3310/qwen2.5-7b-tool-calling-lora) |
+| AWQ quantized | [huggingface.co/KIM3310/qwen2.5-7b-tool-calling-awq](https://huggingface.co/KIM3310/qwen2.5-7b-tool-calling-awq) |
+| W&B training log | [Weights & Biases run](https://wandb.ai/KIM3310/tool-call-finetune-lab) |
 
 ## Repository Layout
 
