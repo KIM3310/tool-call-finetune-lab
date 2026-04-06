@@ -21,6 +21,6 @@
 - The attached Kaggle dataset page is public and the Kaggle notebook page is now live.
 - The latest authenticated Kaggle push succeeded, and the remote kernel reached `COMPLETE` on Kaggle.
 - That successful public run used the smoke fallback path on an unsupported accelerator, so it proves public execution hygiene rather than full QLoRA benchmark output.
-- The repo now mirrors the completed public Kaggle smoke result as a checked-in JSON artifact for durable recruiter-facing proof.
+- The repo mirrors the completed public Kaggle smoke result as a checked-in JSON artifact.
 - The Hugging Face artifact URLs are not publicly reachable from this environment right now.
 - A full `results/bfcl_results.json` still requires the actual fine-tuned weights to be available again.

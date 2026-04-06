@@ -1,15 +1,4 @@
-"""Push the fine-tuned model and model card to HuggingFace Hub.
-
-Usage:
-    python scripts/push_to_hub.py \
-        --model-path outputs/merged-model \
-        --repo-id KIM3310/qwen2.5-7b-tool-calling-lora
-
-    python scripts/push_to_hub.py \
-        --model-path outputs/awq-model \
-        --repo-id KIM3310/qwen2.5-7b-tool-calling-awq \
-        --model-card-extra "AWQ INT4 quantized version."
-"""
+"""Push model + model card to HuggingFace Hub."""
 
 from __future__ import annotations
 
@@ -96,7 +85,7 @@ MODEL_CARD_TEMPLATE = dedent(
 
 
 def _write_model_card(model_path: str, repo_id: str, extra: str = "") -> str:
-    """Write a README.md model card to the model directory."""
+    """Write model card README.md into the model dir."""
     card_content = MODEL_CARD_TEMPLATE.format(repo_id=repo_id, extra=extra)
     card_path = Path(model_path) / "README.md"
     with open(card_path, "w", encoding="utf-8") as f:
@@ -112,18 +101,7 @@ def push_to_hub(
     model_card_extra: str = "",
     commit_message: str = "Upload fine-tuned model",
 ) -> str:
-    """Upload model files to HuggingFace Hub.
-
-    Args:
-        model_path: Local path to the model directory.
-        repo_id: HuggingFace repository ID (e.g. 'KIM3310/my-model').
-        private: Whether to create a private repository.
-        model_card_extra: Additional text to append to the model card.
-        commit_message: Git commit message for the upload.
-
-    Returns:
-        URL of the uploaded model on HuggingFace Hub.
-    """
+    """Upload model dir to HF Hub. Returns the repo URL."""
     from huggingface_hub import HfApi, create_repo
 
     hf_token = os.environ.get("HF_TOKEN")

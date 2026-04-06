@@ -1,13 +1,4 @@
-"""Merge LoRA adapter weights back into the base model.
-
-Produces a single, self-contained model directory that can be loaded
-with AutoModelForCausalLM.from_pretrained() without PEFT installed.
-
-Usage:
-    python -m tool_call_finetune_lab.train.merge_adapter \
-        --adapter-path outputs/lora-adapter \
-        --output-path outputs/merged-model
-"""
+"""Merge LoRA adapter into base model so it can be loaded without PEFT."""
 
 from __future__ import annotations
 
@@ -29,18 +20,7 @@ def merge_and_save(
     torch_dtype: str = "bfloat16",
     safe_serialization: bool = True,
 ) -> str:
-    """Load base model + LoRA adapter, merge weights, and save merged model.
-
-    Args:
-        base_model: HuggingFace model ID or local path for the base model.
-        adapter_path: Path to the directory containing LoRA adapter weights.
-        output_path: Destination directory for the merged model.
-        torch_dtype: Torch dtype string for loading the base model.
-        safe_serialization: Whether to save in safetensors format.
-
-    Returns:
-        The output path where the merged model was saved.
-    """
+    """Load base + adapter, merge, save to output_path. Returns the output path."""
     import torch
     from peft import PeftModel
     from transformers import AutoModelForCausalLM, AutoTokenizer

@@ -1,9 +1,4 @@
-"""Download Qwen2.5-7B-Instruct from HuggingFace Hub.
-
-Usage:
-    python scripts/download_base_model.py
-    python scripts/download_base_model.py --model Qwen/Qwen2.5-7B-Instruct --dest models/base
-"""
+"""Download base model from HuggingFace Hub."""
 
 from __future__ import annotations
 
@@ -24,16 +19,7 @@ def download_model(
     dest_dir: str = "models/base",
     revision: str = "main",
 ) -> str:
-    """Download a model from HuggingFace Hub to a local directory.
-
-    Args:
-        model_id: HuggingFace model repository ID.
-        dest_dir: Local directory to save the model.
-        revision: Git revision (branch, tag, or commit hash).
-
-    Returns:
-        Absolute path to the downloaded model directory.
-    """
+    """Download model snapshot to dest_dir. Returns the local path."""
     from huggingface_hub import snapshot_download
 
     dest = Path(dest_dir).resolve()

@@ -1,8 +1,7 @@
-"""Build public-release status and evaluator smoke artifacts.
+"""Build release status + evaluator smoke artifacts.
 
-This script does not fabricate model benchmark numbers. It creates:
-1. A small evaluator smoke artifact proving the BFCL scoring harness runs.
-2. A release-status ledger showing current external publish blockers.
+Creates a small smoke artifact (proves the BFCL scorer runs) and a
+release status ledger (checks external publish state).
 """
 
 from __future__ import annotations
@@ -216,7 +215,7 @@ def write_markdown(smoke: dict[str, Any], status: dict[str, Any]) -> None:
         "- The attached Kaggle dataset page is public and the Kaggle notebook page is now live.",
         "- The latest authenticated Kaggle push succeeded, and the remote kernel reached `COMPLETE` on Kaggle.",
         "- That successful public run used the smoke fallback path on an unsupported accelerator, so it proves public execution hygiene rather than full QLoRA benchmark output.",
-        "- The repo now mirrors the completed public Kaggle smoke result as a checked-in JSON artifact for durable recruiter-facing proof.",
+        "- The repo mirrors the completed public Kaggle smoke result as a checked-in JSON artifact.",
         "- The Hugging Face artifact URLs are not publicly reachable from this environment right now.",
         "- A full `results/bfcl_results.json` still requires the actual fine-tuned weights to be available again.",
     ]

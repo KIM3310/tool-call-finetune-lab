@@ -1,9 +1,4 @@
-"""Sync the checked-in Kaggle notebook into the kernel folder and set visibility.
-
-Usage:
-    python scripts/sync_kaggle_kernel.py --public
-    python scripts/sync_kaggle_kernel.py --private
-"""
+"""Sync Kaggle notebook into kernel folder and set visibility."""
 
 from __future__ import annotations
 
