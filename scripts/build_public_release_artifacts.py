@@ -15,7 +15,6 @@ import requests
 
 from tool_call_finetune_lab.eval.bfcl_runner import evaluate
 
-
 ROOT = Path(__file__).resolve().parents[1]
 RESULTS_DIR = ROOT / "results"
 TODAY = date.today().isoformat()
@@ -56,7 +55,7 @@ def _make_example(
                     "parameters": {
                         "type": "object",
                         "properties": {
-                            key: {"type": "string"} for key in arguments.keys()
+                            key: {"type": "string"} for key in arguments
                         },
                         "required": list(arguments.keys()),
                     },
