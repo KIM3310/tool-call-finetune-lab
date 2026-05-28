@@ -27,6 +27,10 @@ A tool-call adaptation lab that connects training, benchmark evaluation, and ser
 - **Verification:** Run `make verify`; run `make eval` only when the required model/eval assets are available.
 - **Commercial read:** Sell it as model adaptation, benchmark evaluation, and serving-readiness work for tool-calling systems.
 
+## Commercialization Playbook
+
+- [Monetization and GTM playbook](docs/monetization-playbook.md) maps the repository to buyer segments, offer ladder, pricing hypotheses, proof gates, and risk boundaries.
+
 ## Motivation
 
 [stage-pilot](https://github.com/KIM3310/stage-pilot) gets tool-calling success from 25% to 90% via middleware (parser recovery + retries). This repo tries to close the remaining gap by fine-tuning the model itself to produce better tool calls in the first place.
