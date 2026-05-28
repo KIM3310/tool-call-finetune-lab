@@ -8,6 +8,18 @@
 
 QLoRA fine-tuning of **Qwen2.5-7B-Instruct** for tool-calling, evaluated on [BFCL](https://gorilla.cs.berkeley.edu/leaderboard.html), served with vLLM.
 
+## Product and Review Surface
+
+A tool-call adaptation lab that connects training, benchmark evaluation, and serving notes into one model-readiness surface.
+
+| Lens | Definition |
+|---|---|
+| Buyer or user | AI platform teams, model-evaluation teams, applied ML engineers, and developer-tool builders. |
+| Commercial route | Sell model adaptation studies, BFCL-style evaluation packs, QLoRA training setup, and serving-readiness reviews. |
+| Review signal | Open-weight training notes, benchmark evaluation, QLoRA/PyTorch framing, vLLM serving notes, and tool-calling datasets. |
+| Safety boundary | Fine-tuned models need dataset licensing checks, eval coverage, and deployment controls before production use. |
+| Fast proof | Run the available evaluation scripts and inspect training config, benchmark reports, and serving notes. |
+
 ## Motivation
 
 [stage-pilot](https://github.com/KIM3310/stage-pilot) gets tool-calling success from 25% to 90% via middleware (parser recovery + retries). This repo tries to close the remaining gap by fine-tuning the model itself to produce better tool calls in the first place.
