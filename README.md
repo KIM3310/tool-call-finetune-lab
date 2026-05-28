@@ -20,6 +20,13 @@ A tool-call adaptation lab that connects training, benchmark evaluation, and ser
 | Safety boundary | Fine-tuned models need dataset licensing checks, eval coverage, and deployment controls before production use. |
 | Fast proof | Run the available evaluation scripts and inspect training config, benchmark reports, and serving notes. |
 
+## Reviewer Fast Path
+
+- **First minute:** Read the BFCL setup, dataset split, and serving notes before any GPU-heavy path.
+- **Local demo:** Run `make install` and inspect configs; GPU paths are optional and explicit.
+- **Verification:** Run `make verify`; run `make eval` only when the required model/eval assets are available.
+- **Commercial read:** Sell it as model adaptation, benchmark evaluation, and serving-readiness work for tool-calling systems.
+
 ## Motivation
 
 [stage-pilot](https://github.com/KIM3310/stage-pilot) gets tool-calling success from 25% to 90% via middleware (parser recovery + retries). This repo tries to close the remaining gap by fine-tuning the model itself to produce better tool calls in the first place.
