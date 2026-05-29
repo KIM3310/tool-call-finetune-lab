@@ -2,7 +2,7 @@
 
 Updated: 2026-05-29
 
-This document is the short path for a recruiter, hiring manager, technical reviewer, or buyer who wants to understand what this repository proves without wandering through every file.
+This document is the short path for a technical reviewer, engineering leader, product evaluator, or buyer who wants to understand what this repository proves without wandering through every file.
 
 ## One-Line Proof
 
@@ -13,7 +13,7 @@ This document is the short path for a recruiter, hiring manager, technical revie
 | Lens | Answer |
 |---|---|
 | Primary reviewer | AI platform teams, applied ML engineers, and model evaluation groups. |
-| Hiring signal | Can the project be explained, verified, bounded, and extended like a real product surface? |
+| Technical signal | Can the project be explained, verified, bounded, and extended like a real product surface? |
 | Buyer signal | Is there a narrow operational pain, a runnable proof path, and a risk-aware pilot shape? |
 | Stack signal | Python, Docker |
 
@@ -71,4 +71,4 @@ This document is the short path for a recruiter, hiring manager, technical revie
 
 ## Review Verdict
 
-This repository should be evaluated as part of the broader KIM3310 portfolio: it is strongest when the reviewer sees the link between a concrete implementation, a documented verification path, and a monetizable or employable operating story.
+This repository should be evaluated as part of the broader KIM3310 portfolio: it is strongest when the reviewer sees the link between a concrete implementation, a documented verification path, and an externally credible operating story.
