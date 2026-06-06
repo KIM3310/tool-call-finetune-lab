@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tool-Call Fine-Tune Lab Demo</title>
+  <meta name="description" content="Credential-free public demo for Tool-Call Fine-Tune Lab." />
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #15171c;
+      --muted: #606772;
+      --line: rgba(28, 35, 48, 0.14);
+      --panel: rgba(255, 255, 255, 0.78);
+      --panel-strong: rgba(255, 255, 255, 0.92);
+      --blue: #1266f1;
+      --green: #087f5b;
+      --amber: #b7791f;
+      --rose: #b42318;
+      --shadow: 0 24px 70px rgba(25, 34, 51, 0.12);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        linear-gradient(120deg, rgba(18, 102, 241, 0.12), transparent 32%),
+        linear-gradient(250deg, rgba(8, 127, 91, 0.12), transparent 34%),
+        #f7f9fc;
+    }
+    a { color: inherit; }
+    .shell { width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 24px 0 44px; }
+    .nav { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 42px; }
+    .brand { font-weight: 850; letter-spacing: 0; }
+    .nav a { color: var(--muted); text-decoration: none; font-size: 0.92rem; }
+    .hero { display: grid; grid-template-columns: minmax(0, 0.95fr) minmax(360px, 1.05fr); gap: 24px; align-items: stretch; }
+    .copy, .demo-panel, .metric, .timeline, .notice {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(20px);
+    }
+    .copy { padding: 34px; border-radius: 18px; }
+    .eyebrow { margin: 0 0 12px; color: var(--blue); font-size: 0.78rem; font-weight: 850; text-transform: uppercase; letter-spacing: 0.12em; }
+    h1 { margin: 0; font-size: clamp(2.5rem, 6vw, 5.8rem); line-height: 0.94; letter-spacing: 0; }
+    .lede { margin: 24px 0 0; color: var(--muted); font-size: 1.08rem; line-height: 1.7; }
+    .quick { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 24px; }
+    .quick span { border: 1px solid var(--line); border-radius: 999px; padding: 8px 11px; background: rgba(255,255,255,0.72); color: var(--muted); font-size: 0.8rem; font-weight: 760; }
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
+    .actions a { min-height: 42px; display: inline-flex; align-items: center; border-radius: 10px; padding: 0 14px; text-decoration: none; font-weight: 780; border: 1px solid var(--line); background: rgba(255,255,255,0.82); }
+    .actions a.primary { background: var(--ink); color: white; border-color: var(--ink); }
+    .demo-panel { min-height: 560px; border-radius: 18px; padding: 20px; display: grid; grid-template-rows: auto auto 1fr; gap: 14px; }
+    .panel-top { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; }
+    .panel-top h2 { margin: 0; font-size: 1.1rem; }
+    .status { color: var(--green); font-size: 0.78rem; font-weight: 850; text-transform: uppercase; letter-spacing: 0.08em; }
+    .scenario-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+    .scenario-button { min-width: 0; min-height: 86px; border: 1px solid var(--line); border-radius: 12px; padding: 12px; background: rgba(255,255,255,0.64); color: var(--ink); text-align: left; cursor: pointer; transition: transform 160ms ease, border-color 160ms ease, background 160ms ease; }
+    .scenario-button:hover, .scenario-button.active { transform: translateY(-2px); border-color: rgba(18,102,241,0.45); background: rgba(255,255,255,0.94); }
+    .scenario-button span, .scenario-button strong { display: block; overflow-wrap: anywhere; }
+    .scenario-button span { color: var(--muted); font-size: 0.76rem; font-weight: 780; }
+    .scenario-button strong { margin-top: 8px; font-size: 0.96rem; }
+    .screen { border: 1px solid var(--line); border-radius: 16px; background: var(--panel-strong); overflow: hidden; display: grid; grid-template-rows: auto 1fr; }
+    .screen-bar { min-height: 44px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 14px; border-bottom: 1px solid var(--line); background: rgba(248,250,252,0.9); }
+    .dots { display: inline-flex; gap: 6px; }
+    .dots i { width: 9px; height: 9px; border-radius: 999px; display: block; background: var(--line); }
+    .demo-body { display: grid; grid-template-columns: 0.92fr 1.08fr; gap: 14px; padding: 16px; }
+    .metric { border-radius: 14px; padding: 16px; box-shadow: none; }
+    .metric span { color: var(--muted); font-size: 0.78rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; }
+    .metric strong { display: block; margin-top: 10px; font-size: 2rem; line-height: 1; }
+    .metric p { color: var(--muted); line-height: 1.55; margin: 14px 0 0; }
+    .timeline { border-radius: 14px; padding: 16px; box-shadow: none; }
+    .timeline h3 { margin: 0 0 12px; font-size: 1rem; }
+    .step { display: grid; grid-template-columns: 28px 1fr; gap: 10px; padding: 10px 0; border-top: 1px solid var(--line); }
+    .step:first-of-type { border-top: 0; }
+    .step b { width: 28px; height: 28px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; background: rgba(18,102,241,0.1); color: var(--blue); font-size: 0.78rem; }
+    .step span { color: var(--muted); line-height: 1.45; }
+    .below { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 16px; }
+    .notice { border-radius: 16px; padding: 18px; box-shadow: none; }
+    .notice h3 { margin: 0; font-size: 0.98rem; }
+    .notice p { margin: 10px 0 0; color: var(--muted); line-height: 1.55; }
+    code { border: 1px solid var(--line); border-radius: 8px; padding: 2px 6px; background: rgba(255,255,255,0.78); color: #263142; }
+    @media (max-width: 920px) {
+      .hero, .demo-body, .below { grid-template-columns: 1fr; }
+      .scenario-grid { grid-template-columns: 1fr; }
+      .copy { padding: 24px; }
+      .demo-panel { min-height: auto; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <nav class="nav" aria-label="Repository links">
+      <div class="brand">KIM3310 / tool-call-finetune-lab</div>
+      <a href="https://github.com/KIM3310/tool-call-finetune-lab">GitHub repository</a>
+    </nav>
+
+    <section class="hero">
+      <div class="copy">
+        <p class="eyebrow">Public demo</p>
+        <h1>Tool-Call Fine-Tune Lab</h1>
+        <p class="lede">Fine-tuning lab for tool-call behavior with schema checks, BFCL-style evaluation, and serving notes.</p>
+        <div class="quick" aria-label="Demo facts">
+          <span>Credential-free</span>
+          <span>Synthetic data</span>
+          <span>Reviewer-safe</span>
+          <span>GitHub Pages</span>
+        </div>
+        <div class="actions">
+          <a class="primary" href="#demo">Try the demo</a>
+          <a href="https://github.com/KIM3310/tool-call-finetune-lab">Inspect source</a>
+        </div>
+      </div>
+
+      <section class="demo-panel" id="demo" aria-label="Interactive demo">
+        <div class="panel-top">
+          <div>
+            <p class="eyebrow">Live proof surface</p>
+            <h2>QLoRA plan, schema fidelity, BFCL evaluation posture</h2>
+          </div>
+          <div class="status">online</div>
+        </div>
+        <div class="scenario-grid" aria-label="Demo scenarios">
+          <button class="scenario-button active" type="button" data-index="0" aria-pressed="true"><span>Schema fidelity</span><strong>96.4% valid calls</strong></button>
+          <button class="scenario-button" type="button" data-index="1" aria-pressed="false"><span>Fine-tune plan</span><strong>QLoRA path</strong></button>
+          <button class="scenario-button" type="button" data-index="2" aria-pressed="false"><span>Serving review</span><strong>vLLM-ready notes</strong></button>
+        </div>
+        <div class="screen">
+          <div class="screen-bar">
+            <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+            <code>tool-call-finetune-lab demo</code>
+          </div>
+          <div class="demo-body">
+            <article class="metric">
+              <span id="scenario-title">Schema fidelity</span>
+              <strong id="scenario-metric">96.4% valid calls</strong>
+              <p id="scenario-detail">Shows synthetic tool-call outputs being checked against strict schema expectations.</p>
+            </article>
+            <article class="timeline">
+              <h3>Review flow</h3>
+              <div class="step"><b>1</b><span>Open a synthetic scenario that matches the repository's core workflow.</span></div>
+              <div class="step"><b>2</b><span>Inspect the signal, boundary, and reviewer-facing output without credentials.</span></div>
+              <div class="step"><b>3</b><span>Use the source repository and local verification command for implementation-level review.</span></div>
+            </article>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <section class="below" aria-label="Review details">
+      <article class="notice">
+        <h3>Target buyer</h3>
+        <p>AI platform and model adaptation teams</p>
+      </article>
+      <article class="notice">
+        <h3>Commercial wedge</h3>
+        <p>Tool-call fine-tune assessment and evaluation pack</p>
+      </article>
+      <article class="notice">
+        <h3>Local verification</h3>
+        <p><code>make verify</code></p>
+      </article>
+    </section>
+  </main>
+
+  <script>
+    const scenarios = [{"title":"Schema fidelity","metric":"96.4% valid calls","detail":"Shows synthetic tool-call outputs being checked against strict schema expectations."},{"title":"Fine-tune plan","metric":"QLoRA path","detail":"Summarizes dataset preparation, adapter training, and validation boundaries."},{"title":"Serving review","metric":"vLLM-ready notes","detail":"Highlights deployment assumptions, latency risks, and rollback considerations."}];
+    const buttons = Array.from(document.querySelectorAll('.scenario-button'));
+    const title = document.getElementById('scenario-title');
+    const metric = document.getElementById('scenario-metric');
+    const detail = document.getElementById('scenario-detail');
+    buttons.forEach((button) => {
+      button.addEventListener('click', () => {
+        const index = Number(button.dataset.index);
+        const scenario = scenarios[index];
+        buttons.forEach((item) => {
+          item.classList.toggle('active', item === button);
+          item.setAttribute('aria-pressed', item === button ? 'true' : 'false');
+        });
+        title.textContent = scenario.title;
+        metric.textContent = scenario.metric;
+        detail.textContent = scenario.detail;
+      });
+    });
+  </script>
+</body>
+</html>

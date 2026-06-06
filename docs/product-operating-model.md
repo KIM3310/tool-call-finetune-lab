@@ -1,5 +1,10 @@
 # Product Operating Model
 
+## Public Demo
+
+- URL: https://kim3310.github.io/tool-call-finetune-lab/
+- Scope: credential-free synthetic demo surface for quick reviewer inspection.
+
 Repository: `tool-call-finetune-lab`
 Last reviewed: 2026-06-03 KST
 

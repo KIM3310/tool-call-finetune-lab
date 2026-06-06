@@ -1,3 +1,10 @@
+# Tool-Call Fine-Tune Lab
+
+## Live Demo
+
+- [Open the public GitHub Pages demo](https://kim3310.github.io/tool-call-finetune-lab/)
+- Scope: credential-free, synthetic-data demo for reviewers and evaluators.
+
 [![CI](https://github.com/KIM3310/tool-call-finetune-lab/actions/workflows/ci.yml/badge.svg)](https://github.com/KIM3310/tool-call-finetune-lab/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/KIM3310/tool-call-finetune-lab/branch/main/graph/badge.svg)](https://codecov.io/gh/KIM3310/tool-call-finetune-lab)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/downloads/)
