@@ -14,6 +14,15 @@ This file is a commercial planning artifact, but it does not publish public fina
 2. **Scoped diagnostic** - review the buyer workflow, data boundary, integration needs, and acceptance criteria.
 3. **Implementation or operating support** - connect only the resources approved in [service architecture](service-architecture.md).
 
+## Revenue Channel
+
+- **Channel:** B2B diagnostics and pilots
+- **First commercial action:** Paid readiness review, scoped proof-of-value pilot, then implementation or governance support.
+- **Conversion path:** Portfolio proof, GitHub evidence, direct outreach to AI, data, platform, and security leaders.
+- **Activation path:** Confirm workflow owner, approved sample data, success criteria, and minimum cloud resources before connecting real integrations.
+- **Retention path:** Quarterly eval, governance, reliability, and handoff reviews after the first successful pilot.
+- **Public boundary:** Do not publish projections, price promises, or buyer-specific contract assumptions in this repository.
+
 ## Acquisition Channels
 
 - Portfolio and GitHub proof links
