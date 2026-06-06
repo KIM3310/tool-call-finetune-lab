@@ -2,7 +2,7 @@
 
 Updated: 2026-05-30
 
-This note specializes the repository for revenue. It combines product strategy, UX design, behavioral economics, and neuroscience-informed attention and working-memory design in a practical way: reduce confusion, build trust, help the right user act, and avoid manipulative conversion patterns.
+This note specializes the repository for service launch. It combines product strategy, UX design, behavioral economics, and neuroscience-informed attention and working-memory design in a practical way: reduce confusion, build trust, help the right user act, and avoid manipulative conversion patterns.
 
 ## Commercial Focus
 
@@ -12,7 +12,7 @@ This note specializes the repository for revenue. It combines product strategy, 
 | Lane | B2B model adaptation and eval |
 | Primary buyer or user | AI platform teams, applied ML engineers, and model evaluation groups. |
 | Value wedge | QLoRA/BFCL/tool-call adaptation lab with serving-readiness notes. |
-| Revenue model | Developer tooling support, integration, audit, or package sponsorship |
+| Service model | Developer tooling support, integration, audit, or package sponsorship |
 | Operating note | Show reliability proof first, then sell integration, custom adapters, support, or evaluation setup. |
 | Best channel | Technical articles, GitHub package surface, benchmark reports, and direct platform-team outreach. |
 
@@ -53,7 +53,7 @@ This note specializes the repository for revenue. It combines product strategy, 
 - Paid entry: Model adaptation study ($5k-$15k eval study) tied to one integration or reliability question.
 - Expansion: BFCL-style evaluation pack ($15k-$60k adaptation sprint) and Serving readiness review ($3k-$12k/month model eval ops) after internal adoption starts.
 
-## Pricing Frame
+## Scope Frame
 
 - Price against integration time, reliability risk, maintenance burden, or evaluation coverage.
 - Let open proof reduce adoption friction, then charge for adaptation, support, or governance.
@@ -67,8 +67,8 @@ This note specializes the repository for revenue. It combines product strategy, 
 
 ## Ethical Guardrails
 
-- No fake users, fake logos, fake revenue, fake benchmarks, or unverifiable endorsements.
-- No urgency timers, hidden opt-outs, forced continuity, or confusing pricing.
+- No fake users, fake logos, fake financial outcomes, fake benchmarks, or unverifiable endorsements.
+- No urgency timers, hidden opt-outs, forced continuity, or confusing scope.
 - Conversion prompts should come after value or evidence, not before.
 - Data collection should be minimal, visible, and tied to product value.
 - Dataset licensing required
