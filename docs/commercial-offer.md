@@ -12,7 +12,7 @@ This is the buyer-ready version of the repository. It turns the technical proof 
 | Buyer | AI platform teams, applied ML engineers, and model evaluation groups. |
 | Pain wedge | QLoRA/BFCL/tool-call adaptation lab with serving-readiness notes. |
 | Front-door offer | Model adaptation study |
-| Entry scope | $5k-$15k eval study |
+| Entry scope | Scope after buyer intake |
 | Proof before pitch | make verify passes |
 | Next buyer action | Review one proof artifact, then choose diagnostic, workshop, pilot, support, or revival path. |
 
@@ -20,9 +20,9 @@ This is the buyer-ready version of the repository. It turns the technical proof 
 
 | Offer | Scope assumption | Buyer-facing scope |
 |---|---|---|
-| Model adaptation study | $5k-$15k eval study | Publish eval template |
-| BFCL-style evaluation pack | $15k-$60k adaptation sprint | Create dataset license checklist |
-| Serving readiness review | $3k-$12k/month model eval ops | Offer adaptation assessment |
+| Model adaptation study | Scope after buyer intake | Publish eval template |
+| BFCL-style evaluation pack | Scope after buyer intake | Create dataset license checklist |
+| Serving readiness review | Scope after buyer intake | Offer adaptation assessment |
 
 ## Close Path
 

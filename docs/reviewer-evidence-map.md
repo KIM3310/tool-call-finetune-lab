@@ -49,9 +49,9 @@ Use this page as the short path through the repository. It keeps the review grou
 
 | Possible offer | Working scope assumption |
 |---|---|
-| Model adaptation study | $5k-$15k eval study |
-| BFCL-style evaluation pack | $15k-$60k adaptation sprint |
-| Serving readiness review | $3k-$12k/month model eval ops |
+| Model adaptation study | Scope after buyer intake |
+| BFCL-style evaluation pack | Scope after buyer intake |
+| Serving readiness review | Scope after buyer intake |
 
 ## Boundaries
 
