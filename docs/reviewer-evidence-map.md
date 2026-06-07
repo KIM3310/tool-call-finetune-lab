@@ -45,13 +45,13 @@ Use this page as the short path through the repository. It keeps the review grou
 - Training config is explicit
 - GPU paths are separated
 
-## Commercial Notes
+## Review Notes
 
 | Possible offer | Working scope assumption |
 |---|---|
-| Model adaptation study | Scope after buyer intake |
-| BFCL-style evaluation pack | Scope after buyer intake |
-| Serving readiness review | Scope after buyer intake |
+| Model adaptation study | Scope after reviewer intake |
+| BFCL-style evaluation pack | Scope after reviewer intake |
+| Serving readiness review | Scope after reviewer intake |
 
 ## Boundaries
 

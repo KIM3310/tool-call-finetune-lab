@@ -64,7 +64,7 @@ Three configs evaluated:
 - **Parallel**: where open models struggle most, and where LoRA fine-tuning helps the most (largest relative gain).
 - **Overall**: weighted average.
 
-80%+ overall is competitive with commercial APIs for practical deployments, especially with stage-pilot's recovery layer on top.
+80%+ overall is competitive with hosted APIs for practical deployments, especially with stage-pilot's recovery layer on top.
 
 ## Limitations
 
