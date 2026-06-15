@@ -23,7 +23,7 @@ A tool-call adaptation lab that connects training, benchmark evaluation, and ser
 |---|---|
 | Audience | AI platform teams, model-evaluation teams, applied ML engineers, and developer-tool builders. |
 | Review path | Validate the demo, README, architecture notes, and quality gate before deeper workflow review. |
-| Review signal | Open-weight training notes, benchmark evaluation, QLoRA/PyTorch framing, vLLM serving notes, and tool-calling datasets. |
+| Architecture signal | Open-weight training notes, benchmark evaluation, QLoRA/PyTorch framing, vLLM serving notes, and tool-calling datasets. |
 | Safety boundary | Fine-tuned models need dataset licensing checks, eval coverage, and deployment controls before production use. |
 | Fast proof | Run the available evaluation scripts and inspect training config, benchmark reports, and serving notes. |
 
@@ -196,6 +196,10 @@ This repository includes a neutral cloud and AI engineering blueprint that maps 
 ## Enterprise Productization
 
 - [Product operating model](docs/product-operating-model.md) defines the reviewer, trust boundary, trust boundary, operating checks, and service path for this repository.
+
+## System Architecture
+
+- [System architecture](docs/system-architecture.md) maps the runtime boundary, data/control flow, cloud or local deployment surface, and operating assumptions for this repository.
 
 ## Service Architecture
 
