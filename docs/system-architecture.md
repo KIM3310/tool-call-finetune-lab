@@ -17,7 +17,7 @@ Repository-local proof surface for agent runtime reliability and AI workflow orc
 
 ```mermaid
 flowchart LR
-    User["User or technical reader"] --> Surface["Public demo, CLI, package, or README surface"]
+    User["User or architecture inspection"] --> Surface["Public demo, CLI, package, or README surface"]
     Surface --> Runtime["Runtime boundary: Python service or lab runtime, Container build surface, Local compose environment, GitHub Actions validation"]
     Runtime --> Control["Control plane: configuration, policies, adapters, and jobs"]
     Control --> Data["Data and artifacts: fixtures, reports, logs, exports, or model outputs"]
