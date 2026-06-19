@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://kim3310.github.io/tool-call-finetune-lab/sitemap.xml

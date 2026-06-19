@@ -1,0 +1,12 @@
+# Tool-Call Fine-Tune Lab
+
+Purpose: fine-tuning and eval pipeline for tool-call datasets, BFCL-style tests, and serving checks
+Free entry point: free open-source pipeline and sample eval reports
+Paid boundary: paid dataset preparation pack, eval report, and private fine-tuning runbook
+Canonical URL: https://kim3310.github.io/tool-call-finetune-lab/
+Repository: https://github.com/KIM3310/tool-call-finetune-lab
+System architecture: https://github.com/KIM3310/tool-call-finetune-lab/blob/main/docs/system-architecture.md
+Revenue architecture: https://github.com/KIM3310/tool-call-finetune-lab/blob/main/docs/revenue-architecture.md
+Lead capture: mailto:ehdjs1351@gmail.com?subject=Tool-Call%20Fine-Tune%20Lab%20private%20workspace&body=I%20am%20interested%20in%20paid%20dataset%20preparation%20pack%2C%20eval%20report%2C%20and%20private%20fine-tuning%20runbook%20for%20Tool-Call%20Fine-Tune%20Lab.
+
+Use this project as a runnable or inspectable reference for Tool-Call Fine-Tune Lab demo, Tool-Call Fine-Tune Lab system architecture, Tool-Call Fine-Tune Lab developer tool, fine-tuning and eval pipeline for tool-call datasets, BFCL-style tests, and serving checks service.

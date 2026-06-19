@@ -1,0 +1,73 @@
+{
+  "name": "Tool-Call Fine-Tune Lab",
+  "slug": "tool-call-finetune-lab",
+  "canonical_url": "https://kim3310.github.io/tool-call-finetune-lab/",
+  "repository_url": "https://github.com/KIM3310/tool-call-finetune-lab",
+  "architecture_url": "https://github.com/KIM3310/tool-call-finetune-lab/blob/main/docs/system-architecture.md",
+  "revenue_architecture_url": "https://github.com/KIM3310/tool-call-finetune-lab/blob/main/docs/revenue-architecture.md",
+  "lead_capture_url": "mailto:ehdjs1351@gmail.com?subject=Tool-Call%20Fine-Tune%20Lab%20private%20workspace&body=I%20am%20interested%20in%20paid%20dataset%20preparation%20pack%2C%20eval%20report%2C%20and%20private%20fine-tuning%20runbook%20for%20Tool-Call%20Fine-Tune%20Lab.",
+  "productized_offer": "fine-tuning and eval pipeline for tool-call datasets, BFCL-style tests, and serving checks",
+  "first_paid_sku": "paid dataset preparation pack, eval report, and private fine-tuning runbook",
+  "free_lead_magnet": "free open-source pipeline and sample eval reports",
+  "search_positioning": {
+    "primary_query": "Tool-Call Fine-Tune Lab fine-tuning eval pipeline",
+    "secondary_queries": [
+      "Tool-Call Fine-Tune Lab demo",
+      "Tool-Call Fine-Tune Lab system architecture",
+      "Tool-Call Fine-Tune Lab developer tool",
+      "fine-tuning and eval pipeline for tool-call datasets, BFCL-style tests, and serving checks service"
+    ],
+    "audience_intent": "Find a runnable demo, inspect the system architecture, and decide whether a private workspace or implementation package is useful."
+  },
+  "monetization_boundary": {
+    "free": "free open-source pipeline and sample eval reports",
+    "paid": "paid dataset preparation pack, eval report, and private fine-tuning runbook",
+    "metering_hooks": [
+      "workspace_id",
+      "plan",
+      "quota_day",
+      "export_count",
+      "lead_source"
+    ],
+    "cost_guardrails": [
+      "static first",
+      "edge functions",
+      "customer API keys",
+      "cached AI outputs",
+      "synthetic public data"
+    ]
+  },
+  "structured_data": {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Tool-Call Fine-Tune Lab",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "Web, serverless, and local development environments",
+    "url": "https://kim3310.github.io/tool-call-finetune-lab/",
+    "codeRepository": "https://github.com/KIM3310/tool-call-finetune-lab",
+    "description": "Tool-Call Fine-Tune Lab: fine-tuning and eval pipeline for tool-call datasets, BFCL-style tests, and serving checks. Free entry point: free open-source pipeline and sample eval reports. Paid path: paid dataset.",
+    "creator": {
+      "@type": "Person",
+      "name": "KIM3310",
+      "url": "https://github.com/KIM3310"
+    },
+    "offers": [
+      {
+        "@type": "Offer",
+        "name": "free open-source pipeline and sample eval reports",
+        "price": "0",
+        "priceCurrency": "USD",
+        "availability": "https://schema.org/InStock",
+        "url": "https://kim3310.github.io/tool-call-finetune-lab/"
+      },
+      {
+        "@type": "Offer",
+        "name": "paid dataset preparation pack, eval report, and private fine-tuning runbook",
+        "availability": "https://schema.org/LimitedAvailability",
+        "url": "https://github.com/KIM3310/tool-call-finetune-lab/blob/main/docs/revenue-architecture.md"
+      }
+    ],
+    "isAccessibleForFree": true,
+    "keywords": "tool-call-finetune-lab, Tool-Call, Fine-Tune, Lab, fine-tuning, eval, pipeline, tool-call, datasets, BFCL-style, tests, serving, checks, dataset, preparation, pack, runbook, open-source, sample, tier"
+  }
+}
