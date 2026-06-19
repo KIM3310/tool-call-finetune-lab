@@ -8,7 +8,7 @@ version = "0.2.0"
 description = "QLoRA fine-tuning for tool-calling reliability, BFCL evaluation, and vLLM serving"
 license = {text = "Apache-2.0"}
 requires-python = ">=3.10"
-authors = [{name = "Doeon Kim", email = "ehdjs1351@gmail.com"}]
+authors = [{name = "Doeon Kim"}]
 readme = "README.md"
 keywords = ["tool-calling", "function-calling", "lora", "qlora", "fine-tuning", "qwen", "bfcl"]
 classifiers = [
