@@ -5,7 +5,7 @@
   "repository_url": "https://github.com/KIM3310/tool-call-finetune-lab",
   "architecture_url": "https://github.com/KIM3310/tool-call-finetune-lab/blob/main/docs/system-architecture.md",
   "revenue_architecture_url": "https://github.com/KIM3310/tool-call-finetune-lab/blob/main/docs/revenue-architecture.md",
-  "lead_capture_url": "mailto:ehdjs1351@gmail.com?subject=Tool-Call%20Fine-Tune%20Lab%20private%20workspace&body=I%20am%20interested%20in%20paid%20dataset%20preparation%20pack%2C%20eval%20report%2C%20and%20private%20fine-tuning%20runbook%20for%20Tool-Call%20Fine-Tune%20Lab.",
+  "lead_capture_url": "https://github.com/KIM3310/tool-call-finetune-lab/issues/new?template=service-inquiry.yml&title=Private+workspace+inquiry%3A+Tool-Call+Fine-Tune+Lab",
   "productized_offer": "fine-tuning and eval pipeline for tool-call datasets, BFCL-style tests, and serving checks",
   "first_paid_sku": "paid dataset preparation pack, eval report, and private fine-tuning runbook",
   "free_lead_magnet": "free open-source pipeline and sample eval reports",

@@ -10,7 +10,7 @@ This repository now exposes a search-readable service surface in addition to the
 | Revenue architecture | [docs/revenue-architecture.md](./revenue-architecture.md) |
 | System architecture | [docs/system-architecture.md](./system-architecture.md) |
 | Public canonical URL | https://kim3310.github.io/tool-call-finetune-lab/ |
-| Lead capture URL | mailto:ehdjs1351@gmail.com?subject=Tool-Call%20Fine-Tune%20Lab%20private%20workspace&body=I%20am%20interested%20in%20paid%20dataset%20preparation%20pack%2C%20eval%20report%2C%20and%20private%20fine-tuning%20runbook%20for%20Tool-Call%20Fine-Tune%20Lab. |
+| Lead capture URL | https://github.com/KIM3310/tool-call-finetune-lab/issues/new?template=service-inquiry.yml&title=Private+workspace+inquiry%3A+Tool-Call+Fine-Tune+Lab |
 
 ## Search Positioning
 
@@ -27,5 +27,5 @@ The public surface stays crawlable and free. Paid value starts when a visitor wa
 
 - Keep the sitemap and robots file aligned with the final production domain.
 - Submit the canonical URL and sitemap in Google Search Console after the domain is connected.
-- Use a real checkout or lead-capture endpoint only after the free demo shows repeated intent.
+- The lead-capture path is a GitHub Issue Form so private workspace and paid-package requests create a trackable queue before payment infrastructure is added.
 - Keep exact free-tier quotas out of public promises because provider limits change.

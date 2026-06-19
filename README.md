@@ -212,7 +212,7 @@ This repository includes a neutral cloud and AI engineering blueprint that maps 
 - Public entry: free open-source pipeline and sample eval reports
 - Paid boundary: paid dataset preparation pack, eval report, and private fine-tuning runbook
 - Canonical URL: https://kim3310.github.io/tool-call-finetune-lab/
-- Lead capture: mailto:ehdjs1351@gmail.com?subject=Tool-Call%20Fine-Tune%20Lab%20private%20workspace&body=I%20am%20interested%20in%20paid%20dataset%20preparation%20pack%2C%20eval%20report%2C%20and%20private%20fine-tuning%20runbook%20for%20Tool-Call%20Fine-Tune%20Lab.
+- Lead capture: https://github.com/KIM3310/tool-call-finetune-lab/issues/new?template=service-inquiry.yml&title=Private+workspace+inquiry%3A+Tool-Call+Fine-Tune+Lab
 - Machine-readable offer: [docs/service-offer.json](docs/service-offer.json)
 - Search growth implementation: [docs/search-growth-implementation.md](docs/search-growth-implementation.md)
 - Revenue architecture: [docs/revenue-architecture.md](docs/revenue-architecture.md)
