@@ -153,7 +153,7 @@ class EvalConfig:
     max_tokens: int = 512
     temperature: float = 0.0
     timeout_seconds: int = 60
-    openai_model: str = "gpt-4o-mini"
+    openai_model: str = "qwen/qwen3-coder"
 
     def __post_init__(self) -> None:
         Path(self.results_dir).mkdir(parents=True, exist_ok=True)
