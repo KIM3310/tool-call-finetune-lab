@@ -90,7 +90,8 @@ def stratified_split(
 
     Returns (train, val, test) lists.
     """
-    rng = random.Random(seed)
+    # Deterministic data split, not cryptographic use.
+    rng = random.Random(seed)  # nosec B311
 
     # Group by (source, category)
     groups: Dict[Tuple[str, str], List[Dict[str, Any]]] = defaultdict(list)
@@ -136,7 +137,32 @@ def save_jsonl(examples: List[Dict[str, Any]], output_path: str) -> None:
     with open(path, "w", encoding="utf-8") as f:
         for ex in examples:
             f.write(json.dumps(ex, ensure_ascii=False) + "\n")
+    _write_provenance(path, examples)
     logger.info("Saved %d examples to %s", len(examples), path)
+
+
+def _write_provenance(path: Path, examples: List[Dict[str, Any]]) -> None:
+    content = path.read_bytes()
+    source_revisions = sorted(
+        {
+            str(ex.get("provenance", {}).get("source_revision"))
+            for ex in examples
+            if ex.get("provenance", {}).get("source_revision")
+        }
+    )
+    provenance = {
+        "artifact": str(path),
+        "row_count": len(examples),
+        "sha256": hashlib.sha256(content).hexdigest(),
+        "source_revisions": source_revisions,
+        "synthetic_fixture": any(
+            bool(ex.get("provenance", {}).get("synthetic_fixture")) for ex in examples
+        ),
+    }
+    path.with_suffix(path.suffix + ".provenance.json").write_text(
+        json.dumps(provenance, indent=2) + "\n",
+        encoding="utf-8",
+    )
 
 
 def print_statistics(

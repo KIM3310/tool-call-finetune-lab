@@ -7,12 +7,39 @@ import pytest
 
 class TestModelConfig:
     def test_defaults(self) -> None:
-        from tool_call_finetune_lab.config import ModelConfig
+        from tool_call_finetune_lab.config import (
+            QWEN_25_7B_INSTRUCT_PINNED_REVISION,
+            ModelConfig,
+        )
 
         cfg = ModelConfig()
         assert cfg.base_model == "Qwen/Qwen2.5-7B-Instruct"
         assert cfg.max_seq_length == 4096
         assert cfg.torch_dtype == "bfloat16"
+        assert cfg.trust_remote_code is False
+        assert cfg.model_revision == QWEN_25_7B_INSTRUCT_PINNED_REVISION
+        assert cfg.code_revision == QWEN_25_7B_INSTRUCT_PINNED_REVISION
+
+    def test_remote_code_requires_immutable_code_revision(self) -> None:
+        from tool_call_finetune_lab.config import ModelConfig
+
+        with pytest.raises(ValueError, match="code_revision"):
+            ModelConfig(trust_remote_code=True, code_revision="main")
+
+        cfg = ModelConfig(
+            trust_remote_code=True,
+            code_revision="0123456789abcdef0123456789abcdef01234567",
+        )
+        assert cfg.trust_remote_code is True
+
+    def test_model_revisions_must_be_immutable(self) -> None:
+        from tool_call_finetune_lab.config import ModelConfig
+
+        with pytest.raises(ValueError, match="model_revision"):
+            ModelConfig(model_revision="main")
+
+        with pytest.raises(ValueError, match="code_revision"):
+            ModelConfig(code_revision="latest")
 
     def test_invalid_max_seq_length(self) -> None:
         from tool_call_finetune_lab.config import ModelConfig
@@ -150,13 +177,25 @@ class TestTrainingConfig:
 
 class TestDataConfig:
     def test_defaults(self) -> None:
-        from tool_call_finetune_lab.config import DataConfig
+        from tool_call_finetune_lab.config import GLAIVE_PINNED_REVISION, DataConfig
 
         cfg = DataConfig()
         assert cfg.train_ratio == 0.8
         assert cfg.val_ratio == 0.1
         assert cfg.test_ratio == 0.1
         assert cfg.seed == 42
+        assert cfg.dataset_revision == GLAIVE_PINNED_REVISION
+        assert cfg.allow_synthetic_fixtures is False
+        assert len(cfg.bfcl_revision) == 40
+
+    def test_dataset_revision_and_checksum_must_be_immutable(self) -> None:
+        from tool_call_finetune_lab.config import DataConfig
+
+        with pytest.raises(ValueError, match="dataset_revision"):
+            DataConfig(dataset_revision="main")
+
+        with pytest.raises(ValueError, match="glaive_sha256"):
+            DataConfig(glaive_sha256="not-a-digest")
 
     def test_ratios_sum_to_one(self) -> None:
         from tool_call_finetune_lab.config import DataConfig
@@ -191,9 +230,85 @@ class TestServeConfig:
 
         cfg = ServeConfig()
         assert cfg.port == 8000
+        assert cfg.host == "127.0.0.1"
         assert cfg.tensor_parallel == 1
         assert cfg.max_model_len == 4096
         assert cfg.quantization == "awq"
+
+    def test_public_bind_requires_explicit_opt_in(self) -> None:
+        from tool_call_finetune_lab.config import ServeConfig
+
+        with pytest.raises(ValueError, match="allow_public_bind"):
+            ServeConfig(host="0.0.0.0")
+
+        cfg = ServeConfig(host="0.0.0.0", allow_public_bind=True)
+        assert cfg.host == "0.0.0.0"
+
+    def test_vllm_command_secure_defaults(self) -> None:
+        from tool_call_finetune_lab.config import QWEN_25_7B_INSTRUCT_PINNED_REVISION
+        from tool_call_finetune_lab.serve.vllm_launcher import build_vllm_command
+
+        cmd = build_vllm_command("outputs/awq-model")
+
+        assert cmd[cmd.index("--host") + 1] == "127.0.0.1"
+        assert "--trust-remote-code" not in cmd
+        assert cmd[cmd.index("--revision") + 1] == QWEN_25_7B_INSTRUCT_PINNED_REVISION
+        assert cmd[cmd.index("--code-revision") + 1] == QWEN_25_7B_INSTRUCT_PINNED_REVISION
+
+    def test_vllm_public_host_requires_launcher_opt_in(self) -> None:
+        from tool_call_finetune_lab.serve.vllm_launcher import launch
+
+        with pytest.raises(ValueError, match="allow-public-bind"):
+            launch("outputs/awq-model", host="0.0.0.0", dry_run=True)
+
+    def test_vllm_api_key_is_redacted_from_display_command(self) -> None:
+        from tool_call_finetune_lab.serve.vllm_launcher import redact_command
+
+        secret = "test-key-0123456789abcdef"
+        command = ["python", "-m", "vllm", "--api-key", secret]
+
+        assert redact_command(command) == [
+            "python",
+            "-m",
+            "vllm",
+            "--api-key",
+            "[REDACTED]",
+        ]
+        assert command[-1] == secret
+
+    def test_vllm_dry_run_never_prints_api_key(
+        self,
+        caplog: pytest.LogCaptureFixture,
+        capsys: pytest.CaptureFixture[str],
+    ) -> None:
+        from tool_call_finetune_lab.serve.vllm_launcher import launch
+
+        secret = "test-key-0123456789abcdef"
+        launch("outputs/awq-model", api_key=secret, dry_run=True)
+
+        captured = capsys.readouterr()
+        assert secret not in captured.out
+        assert secret not in caplog.text
+        assert "[REDACTED]" in captured.out
+
+    @pytest.mark.parametrize("value", ["1", "true", "TRUE", "yes", "on"])
+    def test_public_bind_env_parser_accepts_only_documented_true_values(self, value: str) -> None:
+        from tool_call_finetune_lab.serve.docker_entrypoint import parse_public_bind_env
+
+        assert parse_public_bind_env(value) is True
+
+    @pytest.mark.parametrize("value", [None, "", "0", "false", "FALSE"])
+    def test_public_bind_env_parser_keeps_false_values_off(self, value: str | None) -> None:
+        from tool_call_finetune_lab.serve.docker_entrypoint import parse_public_bind_env
+
+        assert parse_public_bind_env(value) is False
+
+    @pytest.mark.parametrize("value", ["2", "maybe", " false ", " true "])
+    def test_public_bind_env_parser_fails_closed_on_invalid_values(self, value: str) -> None:
+        from tool_call_finetune_lab.serve.docker_entrypoint import parse_public_bind_env
+
+        with pytest.raises(ValueError, match="VLLM_ALLOW_PUBLIC_BIND"):
+            parse_public_bind_env(value)
 
     def test_invalid_gpu_memory_utilization_zero(self) -> None:
         from tool_call_finetune_lab.config import ServeConfig

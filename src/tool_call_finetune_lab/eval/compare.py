@@ -69,16 +69,22 @@ def run_gpt4o_mini_eval(
     """
     api_key = os.environ.get("OPENROUTER_API_KEY") or os.environ.get("OPENAI_API_KEY")
     if not api_key:
-        logger.warning("OPENROUTER_API_KEY / OPENAI_API_KEY not set — skipping reference evaluation")
+        logger.warning(
+            "OPENROUTER_API_KEY / OPENAI_API_KEY not set — skipping reference evaluation"
+        )
         return None
     base_url = os.environ.get("OPENROUTER_BASE_URL") or os.environ.get("OPENAI_BASE_URL")
-    model = os.environ.get("OPENROUTER_MODEL") or os.environ.get("OPENAI_MODEL") or "qwen/qwen3-coder"
+    model = (
+        os.environ.get("OPENROUTER_MODEL") or os.environ.get("OPENAI_MODEL") or "qwen/qwen3-coder"
+    )
 
     from openai import OpenAI
 
     from tool_call_finetune_lab.eval.bfcl_runner import evaluate, load_test_data
 
-    logger.info("Running reference model evaluation with %s (max %d examples)...", model, max_examples)
+    logger.info(
+        "Running reference model evaluation with %s (max %d examples)...", model, max_examples
+    )
 
     client = OpenAI(api_key=api_key, base_url=base_url) if base_url else OpenAI(api_key=api_key)
 

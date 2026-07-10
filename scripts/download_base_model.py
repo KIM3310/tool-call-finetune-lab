@@ -7,6 +7,11 @@ import logging
 import os
 from pathlib import Path
 
+from tool_call_finetune_lab.config import (
+    QWEN_25_7B_INSTRUCT_PINNED_REVISION,
+    validate_immutable_revision,
+)
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
@@ -17,11 +22,12 @@ logger = logging.getLogger(__name__)
 def download_model(
     model_id: str = "Qwen/Qwen2.5-7B-Instruct",
     dest_dir: str = "models/base",
-    revision: str = "main",
+    revision: str = QWEN_25_7B_INSTRUCT_PINNED_REVISION,
 ) -> str:
     """Download model snapshot to dest_dir. Returns the local path."""
     from huggingface_hub import snapshot_download
 
+    validate_immutable_revision(revision, "revision")
     dest = Path(dest_dir).resolve()
     dest.mkdir(parents=True, exist_ok=True)
 
@@ -67,7 +73,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Download base model from HuggingFace")
     parser.add_argument("--model", default="Qwen/Qwen2.5-7B-Instruct")
     parser.add_argument("--dest", default="models/base")
-    parser.add_argument("--revision", default="main")
+    parser.add_argument("--revision", default=QWEN_25_7B_INSTRUCT_PINNED_REVISION)
     return parser.parse_args()
 
 

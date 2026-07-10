@@ -16,10 +16,16 @@ from __future__ import annotations
 import argparse
 import logging
 import os
-import subprocess
+import subprocess  # nosec B404
 import sys
 from pathlib import Path
 from typing import List, Optional
+
+from tool_call_finetune_lab.config import (
+    QWEN_25_7B_INSTRUCT_PINNED_REVISION,
+    validate_immutable_revision,
+    validate_remote_code_policy,
+)
 
 logging.basicConfig(
     level=logging.INFO,
@@ -27,10 +33,63 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+MANAGED_FORWARD_OPTIONS = frozenset(
+    {
+        "--api-key",
+        "--code-revision",
+        "--config",
+        "--dtype",
+        "--enable-prefix-caching",
+        "--gpu-memory-utilization",
+        "--host",
+        "--max-model-len",
+        "--max-num-seqs",
+        "--model",
+        "--port",
+        "--quantization",
+        "--revision",
+        "--served-model-name",
+        "--tensor-parallel-size",
+        "--tool-call-parser",
+        "--trust-remote-code",
+    }
+)
+
+
+def validate_forwarded_args(extra_args: List[str]) -> None:
+    """Prevent appended vLLM options from overriding validated settings."""
+    for argument in extra_args:
+        if not argument.startswith("--"):
+            continue
+        option = argument.split("=", 1)[0].replace("_", "-")
+        if option in MANAGED_FORWARD_OPTIONS or any(
+            managed.startswith(option) for managed in MANAGED_FORWARD_OPTIONS
+        ):
+            raise ValueError(f"Forwarded vLLM option is managed by this launcher: {option}")
+
+
+def validate_api_key(api_key: str | None) -> None:
+    """Reject empty or trivially weak API keys when authentication is enabled."""
+    if api_key is None:
+        return
+    if len(api_key) < 16 or any(character.isspace() for character in api_key):
+        raise ValueError("VLLM_API_KEY must be at least 16 non-whitespace characters.")
+
+
+def redact_command(command: List[str]) -> List[str]:
+    """Return a display-safe command with API credentials removed."""
+    redacted = list(command)
+    for index, argument in enumerate(redacted):
+        if argument == "--api-key" and index + 1 < len(redacted):
+            redacted[index + 1] = "[REDACTED]"
+        elif argument.startswith("--api-key="):
+            redacted[index] = "--api-key=[REDACTED]"
+    return redacted
+
 
 def build_vllm_command(
     model_path: str,
-    host: str = "0.0.0.0",
+    host: str = "127.0.0.1",
     port: int = 8000,
     tensor_parallel: int = 1,
     max_model_len: int = 4096,
@@ -40,7 +99,10 @@ def build_vllm_command(
     served_model_name: str = "qwen2.5-7b-tool-call",
     max_num_seqs: int = 256,
     enable_prefix_caching: bool = True,
-    trust_remote_code: bool = True,
+    trust_remote_code: bool = False,
+    model_revision: str = QWEN_25_7B_INSTRUCT_PINNED_REVISION,
+    code_revision: str = QWEN_25_7B_INSTRUCT_PINNED_REVISION,
+    api_key: str | None = None,
     extra_args: Optional[List[str]] = None,
 ) -> List[str]:
     """Build the vLLM server command list.
@@ -58,11 +120,19 @@ def build_vllm_command(
         max_num_seqs: Maximum number of concurrent sequences.
         enable_prefix_caching: Enable KV cache prefix sharing.
         trust_remote_code: Pass --trust-remote-code to vLLM.
+        api_key: Optional bearer token for the OpenAI-compatible API.
         extra_args: Additional CLI arguments to append.
 
     Returns:
         Command as a list of strings, ready for subprocess.
     """
+    validate_immutable_revision(model_revision, "model_revision")
+    validate_immutable_revision(code_revision, "code_revision")
+    validate_remote_code_policy(trust_remote_code, code_revision)
+    validate_api_key(api_key)
+    if extra_args:
+        validate_forwarded_args(extra_args)
+
     cmd = [
         sys.executable,
         "-m",
@@ -85,6 +155,10 @@ def build_vllm_command(
         served_model_name,
         "--max-num-seqs",
         str(max_num_seqs),
+        "--revision",
+        model_revision,
+        "--code-revision",
+        code_revision,
     ]
 
     if quantization:
@@ -95,6 +169,9 @@ def build_vllm_command(
 
     if trust_remote_code:
         cmd.append("--trust-remote-code")
+
+    if api_key:
+        cmd.extend(["--api-key", api_key])
 
     # Tool-call specific: enable structured outputs / tool call parser
     cmd.extend(["--tool-call-parser", "hermes"])
@@ -127,7 +204,7 @@ def _detect_quantization(model_path: str) -> Optional[str]:
 
 def launch(
     model_path: str,
-    host: str = "0.0.0.0",
+    host: str = "127.0.0.1",
     port: int = 8000,
     tensor_parallel: int = 1,
     max_model_len: int = 4096,
@@ -136,6 +213,11 @@ def launch(
     dtype: str = "float16",
     served_model_name: str = "qwen2.5-7b-tool-call",
     max_num_seqs: int = 256,
+    allow_public_bind: bool = False,
+    trust_remote_code: bool = False,
+    model_revision: str = QWEN_25_7B_INSTRUCT_PINNED_REVISION,
+    code_revision: str = QWEN_25_7B_INSTRUCT_PINNED_REVISION,
+    api_key: str | None = None,
     dry_run: bool = False,
 ) -> Optional[subprocess.Popen]:  # type: ignore[type-arg]
     """Launch the vLLM server process.
@@ -146,6 +228,9 @@ def launch(
     Returns:
         The Popen process handle (or None if dry_run).
     """
+    if host not in {"127.0.0.1", "localhost", "::1"} and not allow_public_bind:
+        raise ValueError("Non-loopback vLLM host requires --allow-public-bind.")
+
     if quantization is None:
         quantization = _detect_quantization(model_path)
         if quantization:
@@ -164,14 +249,19 @@ def launch(
         dtype=dtype,
         served_model_name=served_model_name,
         max_num_seqs=max_num_seqs,
+        trust_remote_code=trust_remote_code,
+        model_revision=model_revision,
+        code_revision=code_revision,
+        api_key=api_key,
     )
 
-    logger.info("vLLM command: %s", " ".join(cmd))
+    display_command = redact_command(cmd)
+    logger.info("vLLM command: %s", " ".join(display_command))
     logger.info("Model will be served at http://%s:%d/v1", host, port)
 
     if dry_run:
         print("DRY RUN — would execute:")
-        print(" ".join(cmd))
+        print(" ".join(display_command))
         return None
 
     # Set HF token if available
@@ -180,7 +270,8 @@ def launch(
     if hf_token:
         env["HUGGING_FACE_HUB_TOKEN"] = hf_token
 
-    process = subprocess.Popen(cmd, env=env)
+    # Intentional vLLM launch with an argv list and no shell.
+    process = subprocess.Popen(cmd, env=env)  # nosec B603
     logger.info("vLLM server started (PID %d). Press Ctrl+C to stop.", process.pid)
 
     try:
@@ -196,7 +287,7 @@ def launch(
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Launch vLLM server for tool-call model")
     parser.add_argument("--model", default="outputs/awq-model")
-    parser.add_argument("--host", default="0.0.0.0")
+    parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8000)
     parser.add_argument("--tensor-parallel", type=int, default=1)
     parser.add_argument("--max-model-len", type=int, default=4096)
@@ -210,6 +301,22 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--dtype", default="float16", choices=["float16", "bfloat16", "auto"])
     parser.add_argument("--served-model-name", default="qwen2.5-7b-tool-call")
     parser.add_argument("--max-num-seqs", type=int, default=256)
+    parser.add_argument(
+        "--allow-public-bind",
+        action="store_true",
+        help=(
+            "Allow non-loopback hosts such as 0.0.0.0. Use only behind auth, "
+            "firewall, or reverse proxy controls."
+        ),
+    )
+    parser.add_argument("--model-revision", default=QWEN_25_7B_INSTRUCT_PINNED_REVISION)
+    parser.add_argument("--code-revision", default=QWEN_25_7B_INSTRUCT_PINNED_REVISION)
+    parser.add_argument(
+        "--trust-remote-code",
+        action="store_true",
+        help="Explicitly allow audited remote model code. Use with pinned --code-revision.",
+    )
+    parser.add_argument("--api-key", default=os.environ.get("VLLM_API_KEY"))
     parser.add_argument("--dry-run", action="store_true")
     return parser.parse_args()
 
@@ -228,6 +335,11 @@ def main() -> None:
         dtype=args.dtype,
         served_model_name=args.served_model_name,
         max_num_seqs=args.max_num_seqs,
+        allow_public_bind=args.allow_public_bind,
+        trust_remote_code=args.trust_remote_code,
+        model_revision=args.model_revision,
+        code_revision=args.code_revision,
+        api_key=args.api_key,
         dry_run=args.dry_run,
     )
 

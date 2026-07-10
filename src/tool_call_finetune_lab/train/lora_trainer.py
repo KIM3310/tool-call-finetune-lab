@@ -16,6 +16,8 @@ import os
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+from tool_call_finetune_lab.config import QWEN_25_7B_INSTRUCT_PINNED_REVISION
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
@@ -92,6 +94,8 @@ def build_model_and_tokenizer(
     tokenizer = AutoTokenizer.from_pretrained(
         model_config.base_model,
         trust_remote_code=model_config.trust_remote_code,
+        revision=model_config.model_revision,
+        code_revision=model_config.code_revision,
         padding_side="right",
     )
     if tokenizer.pad_token is None:
@@ -110,6 +114,8 @@ def build_model_and_tokenizer(
         quantization_config=bnb_config,
         device_map="auto",
         trust_remote_code=model_config.trust_remote_code,
+        revision=model_config.model_revision,
+        code_revision=model_config.code_revision,
         attn_implementation=model_config.attn_implementation,
     )
 
@@ -260,6 +266,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--grad-accum", type=int, default=4)
     parser.add_argument("--output-dir", default="outputs/lora-adapter")
     parser.add_argument("--max-seq-length", type=int, default=4096)
+    parser.add_argument("--model-revision", default=QWEN_25_7B_INSTRUCT_PINNED_REVISION)
+    parser.add_argument("--code-revision", default=QWEN_25_7B_INSTRUCT_PINNED_REVISION)
+    parser.add_argument(
+        "--trust-remote-code",
+        action="store_true",
+        help="Explicitly allow audited remote model code. Requires pinned --code-revision.",
+    )
     return parser.parse_args()
 
 
@@ -271,6 +284,9 @@ def main() -> None:
     model_config = ModelConfig(
         base_model=args.base_model,
         max_seq_length=args.max_seq_length,
+        model_revision=args.model_revision,
+        code_revision=args.code_revision,
+        trust_remote_code=args.trust_remote_code,
     )
     lora_cfg = LoraConfig(rank=args.rank, alpha=args.alpha)
     training_cfg = TrainingConfig(

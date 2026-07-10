@@ -6,6 +6,12 @@ import argparse
 import logging
 from pathlib import Path
 
+from tool_call_finetune_lab.config import (
+    QWEN_25_7B_INSTRUCT_PINNED_REVISION,
+    validate_immutable_revision,
+    validate_remote_code_policy,
+)
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
@@ -19,11 +25,18 @@ def merge_and_save(
     output_path: str,
     torch_dtype: str = "bfloat16",
     safe_serialization: bool = True,
+    model_revision: str = QWEN_25_7B_INSTRUCT_PINNED_REVISION,
+    code_revision: str = QWEN_25_7B_INSTRUCT_PINNED_REVISION,
+    trust_remote_code: bool = False,
 ) -> str:
     """Load base + adapter, merge, save to output_path. Returns the output path."""
     import torch
     from peft import PeftModel
     from transformers import AutoModelForCausalLM, AutoTokenizer
+
+    validate_immutable_revision(model_revision, "model_revision")
+    validate_immutable_revision(code_revision, "code_revision")
+    validate_remote_code_policy(trust_remote_code, code_revision)
 
     dtype_map = {
         "float16": torch.float16,
@@ -40,7 +53,9 @@ def merge_and_save(
         base_model,
         torch_dtype=dtype,
         device_map="auto",
-        trust_remote_code=True,
+        trust_remote_code=trust_remote_code,
+        revision=model_revision,
+        code_revision=code_revision,
     )
 
     logger.info("Loading LoRA adapter from: %s", adapter_path)
@@ -56,7 +71,12 @@ def merge_and_save(
     )
 
     # Save tokenizer
-    tokenizer = AutoTokenizer.from_pretrained(adapter_path, trust_remote_code=True)
+    tokenizer = AutoTokenizer.from_pretrained(
+        adapter_path,
+        trust_remote_code=trust_remote_code,
+        revision=model_revision,
+        code_revision=code_revision,
+    )
     tokenizer.save_pretrained(str(output_dir))
 
     # Write a small metadata file
@@ -66,6 +86,9 @@ def merge_and_save(
         "base_model": base_model,
         "adapter_path": adapter_path,
         "merge_dtype": torch_dtype,
+        "model_revision": model_revision,
+        "code_revision": code_revision,
+        "trust_remote_code": trust_remote_code,
     }
     with open(output_dir / "merge_metadata.json", "w") as f:
         json.dump(metadata, f, indent=2)
@@ -102,6 +125,13 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Use .bin instead of .safetensors format",
     )
+    parser.add_argument("--model-revision", default=QWEN_25_7B_INSTRUCT_PINNED_REVISION)
+    parser.add_argument("--code-revision", default=QWEN_25_7B_INSTRUCT_PINNED_REVISION)
+    parser.add_argument(
+        "--trust-remote-code",
+        action="store_true",
+        help="Explicitly allow audited remote model code. Use with pinned --code-revision.",
+    )
     return parser.parse_args()
 
 
@@ -113,6 +143,9 @@ def main() -> None:
         output_path=args.output_path,
         torch_dtype=args.dtype,
         safe_serialization=not args.no_safe_serialization,
+        model_revision=args.model_revision,
+        code_revision=args.code_revision,
+        trust_remote_code=args.trust_remote_code,
     )
 
 

@@ -42,8 +42,8 @@ def test_health_check(base_url: str) -> Tuple[bool, str]:
         r = httpx.get(url, timeout=10)
         if r.status_code == 200:
             return True, f"Health check OK ({url})"
-    except Exception:
-        pass
+    except Exception as e:
+        logger.debug("Health endpoint check failed, falling back to models endpoint: %s", e)
 
     # Fallback: try /v1/models
     models_url = base_url.rstrip("/") + "/models"

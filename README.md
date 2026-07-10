@@ -3,7 +3,7 @@
 ## Live Demo
 
 - [Open the public GitHub Pages demo](https://kim3310.github.io/tool-call-finetune-lab/)
-- Scope: credential-free, synthetic-data demo for architecture inspection paths and evaluators.
+- Scope: credential-free, synthetic-data demonstration of the dataset, evaluation, and serving workflow.
 
 [![CI](https://github.com/KIM3310/tool-call-finetune-lab/actions/workflows/ci.yml/badge.svg)](https://github.com/KIM3310/tool-call-finetune-lab/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/KIM3310/tool-call-finetune-lab/branch/main/graph/badge.svg)](https://codecov.io/gh/KIM3310/tool-call-finetune-lab)
@@ -11,35 +11,33 @@
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-green.svg)](LICENSE)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.1%2B-EE4C2C.svg?logo=pytorch)](https://pytorch.org/)
 
-# Tool-Call Fine-Tune Lab
-
 QLoRA fine-tuning of **Qwen2.5-7B-Instruct** for tool-calling, evaluated on [BFCL](https://gorilla.cs.berkeley.edu/leaderboard.html), served with vLLM.
 
-## Product and System Surface
+## System Overview
 
 A tool-call adaptation lab that connects training, benchmark evaluation, and serving notes into one model-readiness surface.
 
-| Lens | Definition |
+| Area | Details |
 |---|---|
-| Audience | AI platform teams, model-evaluation teams, applied ML engineers, and developer-tool builders. |
-| Architecture path | Validate the demo, README, architecture notes, and quality gate before deeper workflow architecture. |
-| System signal | Open-weight training notes, benchmark evaluation, QLoRA/PyTorch framing, vLLM serving notes, and tool-calling datasets. |
-| Safety boundary | Fine-tuned models need dataset licensing checks, eval coverage, and deployment controls before production use. |
-| Fast path | Run the available evaluation scripts and inspect training config, benchmark reports, and serving notes. |
+| Users | AI platform teams, model-evaluation teams, applied ML engineers, and developer-tool builders. |
+| Technical path | Start with the demo, then inspect the training configuration, evaluation pipeline, architecture notes, and quality gate. |
+| System scope | Open-weight training notes, benchmark evaluation, QLoRA/PyTorch framing, vLLM serving notes, and tool-calling datasets. |
+| Operating boundary | Fine-tuned models need dataset licensing checks, eval coverage, and deployment controls before production use. |
+| Evaluation path | Run the available evaluation scripts and inspect the training config, benchmark reports, and serving notes. |
 
-## System Fast Path
+## Evaluation Path
 
-- **First minute:** Read the BFCL setup, dataset split, and serving notes before any GPU-heavy path.
+- **Start here:** Read the BFCL setup, dataset split, and serving notes before any GPU-heavy path.
 - **Local demo:** Run `make install` and inspect configs; GPU paths are optional and explicit.
-- **Verification:** Run `make verify`; run `make eval` only when the required model/eval assets are available.
+- **Checks:** Run `make verify`; run `make eval` only when the required model/eval assets are available.
 
 ## Service Launch Playbook
 
-- [Service launch playbook](docs/service-launch-playbook.md) maps the repository to architecture audiences, operating gates, operating boundaries, and risk controls.
+- [Service launch playbook](docs/service-launch-playbook.md) maps the repository to its product scope, operating gates, deployment boundaries, and risk controls.
 
 ## Architecture Notes
 
-- [Architecture guide](docs/architecture-evidence-map.md) summarizes the project angle, first files to inspect, runtime commands, and known boundaries.
+- [Architecture guide](docs/architecture-evidence-map.md) summarizes the system scope, first files to inspect, runtime commands, and known boundaries.
 - [Quality notes](docs/quality-gate.md) lists the local checks, CI surface, and release expectations for this repository.
 - [Enterprise readiness notes](docs/enterprise-readiness.md) outlines security, data, operations, integration, and handoff expectations.
 
@@ -79,6 +77,14 @@ BFCL v4 (GitHub)          Glaive v2 (HuggingFace)
 - **BFCL**: 10 categories (simple, multiple, parallel, live variants) with ground-truth from `possible_answer/`
 - **Glaive**: multi-turn function-calling conversations with tool definitions
 - Dedup by SHA-256 hash, stratified split by (source, category)
+
+Security/reproducibility defaults:
+
+- Hugging Face model loads use pinned commits and default to `trust_remote_code=False`; enabling remote code requires an explicit flag and immutable `--code-revision`.
+- Glaive preparation downloads a pinned dataset file through Hugging Face Hub and verifies its SHA-256 digest before parsing.
+- BFCL raw downloads use a pinned Git commit, validate the final raw GitHub host/path, and require SHA-256 values for every expected shard.
+- Data preparation fails closed on download errors. Synthetic fixtures require `--allow-synthetic-fixtures` and are marked in JSONL provenance sidecars.
+- vLLM binds to `127.0.0.1` by default. Shared-network hosts such as `0.0.0.0` require `--allow-public-bind` and should be placed behind auth, firewall, or reverse proxy controls.
 
 ## Architecture
 
@@ -128,6 +134,22 @@ make pipeline               # data -> train -> merge -> eval -> quantize
 docker compose up vllm-server
 docker compose run smoke-test
 ```
+
+Default compose publishes the host port on `127.0.0.1` only. The container-internal
+vLLM process may still bind `0.0.0.0` so the smoke-test service can reach it on the
+Docker network.
+
+Public host publishing uses the standalone production Compose file and requires
+an API key with at least 16 characters:
+
+```bash
+export VLLM_API_KEY="$(openssl rand -hex 32)"
+VLLM_PRODUCTION_HOST_BIND=0.0.0.0 docker compose \
+  -f docker-compose.production.yml up vllm-server
+```
+
+The API key protects the OpenAI-compatible routes. Keep the service behind a
+reverse proxy/TLS boundary and firewall rules that restrict endpoint access.
 
 ### Kaggle
 
@@ -187,15 +209,13 @@ Apache-2.0 -- see [LICENSE](LICENSE).
 
 ## Cloud + AI Architecture
 
-This repository includes a neutral cloud and AI engineering blueprint that maps the current proof surface to runtime boundaries, data contracts, model-risk controls, deployment posture, and validation hooks.
-
 - [Cloud + AI architecture blueprint](docs/cloud-ai-architecture.md)
 - [Machine-readable architecture manifest](docs/architecture/blueprint.json)
 - Validation command: `python3 scripts/validate_architecture_blueprint.py`
 
 ## Enterprise Productization
 
-- [Product operating model](docs/product-operating-model.md) defines the architecture inspection, trust boundary, trust boundary, operating checks, and service path for this repository.
+- [Product operating model](docs/product-operating-model.md) defines the product scope, trust boundary, operating checks, and service path for this repository.
 
 ## System Architecture
 

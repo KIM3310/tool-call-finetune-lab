@@ -82,6 +82,7 @@ RUN pip install --no-deps -e .
 
 # Model will be mounted at /model
 ENV MODEL_PATH=/model \
+    VLLM_HOST=127.0.0.1 \
     VLLM_PORT=8000 \
     SERVED_MODEL_NAME=qwen2.5-7b-tool-call \
     TENSOR_PARALLEL=1 \
@@ -93,10 +94,5 @@ EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
     CMD curl -sf http://localhost:${VLLM_PORT}/health || exit 1
 
-CMD python3 -m tool_call_finetune_lab.serve.vllm_launcher \
-    --model "${MODEL_PATH}" \
-    --port "${VLLM_PORT}" \
-    --served-model-name "${SERVED_MODEL_NAME}" \
-    --tensor-parallel "${TENSOR_PARALLEL}" \
-    --max-model-len "${MAX_MODEL_LEN}" \
-    --gpu-memory-utilization "${GPU_MEMORY_UTILIZATION}"
+ENTRYPOINT ["python3", "-m", "tool_call_finetune_lab.serve.docker_entrypoint"]
+CMD []

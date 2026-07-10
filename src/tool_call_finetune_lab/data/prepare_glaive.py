@@ -6,6 +6,7 @@ format used across this project, saving to data/raw/glaive.jsonl.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import logging
 import re
@@ -13,6 +14,16 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from tool_call_finetune_lab.config import DataConfig
+
+try:
+    from datasets import load_dataset
+except ImportError:  # pragma: no cover - exercised only when optional dependency is absent
+    load_dataset = None  # type: ignore[assignment]
+
+try:
+    from huggingface_hub import hf_hub_download
+except ImportError:  # pragma: no cover - exercised only when optional dependency is absent
+    hf_hub_download = None  # type: ignore[assignment]
 
 logging.basicConfig(
     level=logging.INFO,
@@ -28,6 +39,34 @@ FUNCTION_TAG = "FUNCTION RESPONSE:"
 
 # Glaive tool-call markup
 TOOL_CALL_RE = re.compile(r"<functioncall>\s*(.*?)\s*(?:</functioncall>|$)", re.DOTALL)
+
+
+def _sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as source:
+        for chunk in iter(lambda: source.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _download_verified_source(config: DataConfig, token: str | None) -> Path:
+    if hf_hub_download is None:
+        raise RuntimeError("huggingface-hub is not installed")
+    source_path = Path(
+        hf_hub_download(
+            repo_id=config.glaive_repo,
+            filename=config.glaive_filename,
+            repo_type="dataset",
+            revision=config.dataset_revision,
+            token=token,
+        )
+    )
+    actual_sha256 = _sha256_file(source_path)
+    if actual_sha256.lower() != config.glaive_sha256.lower():
+        raise ValueError(
+            f"Glaive source SHA-256 mismatch: expected {config.glaive_sha256}, got {actual_sha256}"
+        )
+    return source_path
 
 
 def _parse_system_block(system_str: str) -> tuple[str, List[Dict[str, Any]]]:
@@ -189,34 +228,58 @@ def _split_chat(chat: str) -> List[tuple[str, str]]:
 
 def download_and_convert(config: DataConfig) -> List[Dict[str, Any]]:
     """Download Glaive v2 from HuggingFace and convert to standard format."""
-    from datasets import load_dataset
-
     examples: List[Dict[str, Any]] = []
 
-    logger.info("Loading Glaive dataset from %s ...", config.glaive_repo)
+    logger.info(
+        "Loading Glaive dataset from %s revision %s ...",
+        config.glaive_repo,
+        config.dataset_revision,
+    )
 
     import os
 
-    load_kwargs: Dict[str, Any] = {}
     hf_token = os.environ.get("HF_TOKEN")
-    if hf_token:
-        load_kwargs["token"] = hf_token
 
     try:
-        ds = load_dataset(config.glaive_repo, split="train", **load_kwargs)
+        if load_dataset is None:
+            raise RuntimeError("datasets is not installed")
+        source_path = _download_verified_source(config, hf_token)
+        # The Hub source is immutable and checksum-verified before local parsing.
+        ds = load_dataset(  # nosec B615
+            "json",
+            data_files=str(source_path),
+            split="train",
+        )
         logger.info("Loaded Glaive dataset: %d rows", len(ds))
 
         for row in ds:
             ex = _parse_glaive_conversation(dict(row))
             if ex:
+                ex["provenance"] = {
+                    "source_revision": config.dataset_revision,
+                    "source_repo": config.glaive_repo,
+                    "source_filename": config.glaive_filename,
+                    "source_sha256": config.glaive_sha256,
+                    "synthetic_fixture": False,
+                }
                 examples.append(ex)
             if config.max_samples_glaive and len(examples) >= config.max_samples_glaive:
                 break
 
     except Exception as e:
-        logger.error("Failed to download Glaive dataset: %s", e)
-        logger.info("Creating minimal synthetic Glaive examples for testing...")
+        if not config.allow_synthetic_fixtures:
+            raise RuntimeError(f"Failed to download Glaive dataset: {e}") from e
+        logger.warning("Failed to download Glaive dataset: %s", e)
+        logger.info("Creating explicitly allowed minimal synthetic Glaive fixtures...")
         examples = _create_synthetic_examples()
+        for ex in examples:
+            ex["provenance"] = {
+                "source_revision": config.dataset_revision,
+                "source_repo": config.glaive_repo,
+                "source_filename": config.glaive_filename,
+                "source_sha256": None,
+                "synthetic_fixture": True,
+            }
 
     logger.info("Total Glaive examples after conversion: %d", len(examples))
     return examples
@@ -337,11 +400,44 @@ def save_jsonl(examples: List[Dict[str, Any]], output_path: str) -> None:
     with open(path, "w", encoding="utf-8") as f:
         for ex in examples:
             f.write(json.dumps(ex, ensure_ascii=False) + "\n")
+    _write_provenance(path, examples)
     logger.info("Saved %d examples to %s", len(examples), path)
 
 
+def _write_provenance(path: Path, examples: List[Dict[str, Any]]) -> None:
+    content = path.read_bytes()
+    source_revisions = sorted(
+        {
+            str(ex.get("provenance", {}).get("source_revision"))
+            for ex in examples
+            if ex.get("provenance", {}).get("source_revision")
+        }
+    )
+    provenance = {
+        "artifact": str(path),
+        "row_count": len(examples),
+        "sha256": hashlib.sha256(content).hexdigest(),
+        "source_revisions": source_revisions,
+        "synthetic_fixture": any(
+            bool(ex.get("provenance", {}).get("synthetic_fixture")) for ex in examples
+        ),
+    }
+    provenance_path = path.with_suffix(path.suffix + ".provenance.json")
+    provenance_path.write_text(json.dumps(provenance, indent=2) + "\n", encoding="utf-8")
+
+
 def main() -> None:
-    config = DataConfig()
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Prepare pinned Glaive data")
+    parser.add_argument("--allow-synthetic-fixtures", action="store_true")
+    parser.add_argument("--dataset-revision", default=None)
+    args = parser.parse_args()
+
+    kwargs: Dict[str, Any] = {"allow_synthetic_fixtures": args.allow_synthetic_fixtures}
+    if args.dataset_revision:
+        kwargs["dataset_revision"] = args.dataset_revision
+    config = DataConfig(**kwargs)
     examples = download_and_convert(config)
     save_jsonl(examples, config.glaive_output)
     logger.info("Glaive preparation complete.")

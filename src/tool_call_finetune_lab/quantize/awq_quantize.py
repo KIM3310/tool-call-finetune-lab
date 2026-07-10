@@ -18,6 +18,12 @@ import random
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+from tool_call_finetune_lab.config import (
+    QWEN_25_7B_INSTRUCT_PINNED_REVISION,
+    validate_immutable_revision,
+    validate_remote_code_policy,
+)
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
@@ -82,7 +88,8 @@ def load_calibration_data(
             "Calculate 15% tip on $47.50.",
         ] * max(1, n_samples // 5)
 
-    rng = random.Random(seed)
+    # Deterministic calibration sampling, not cryptographic use.
+    rng = random.Random(seed)  # nosec B311
     rng.shuffle(examples)
     selected = examples[:n_samples]
 
@@ -121,6 +128,9 @@ def quantize_awq(
     quant_config: Optional[Dict[str, Any]] = None,
     n_calib_samples: int = 512,
     calib_seq_len: int = 512,
+    model_revision: str = QWEN_25_7B_INSTRUCT_PINNED_REVISION,
+    code_revision: str = QWEN_25_7B_INSTRUCT_PINNED_REVISION,
+    trust_remote_code: bool = False,
 ) -> str:
     """Run AWQ quantization on the merged model.
 
@@ -140,6 +150,9 @@ def quantize_awq(
 
     if quant_config is None:
         quant_config = AWQ_DEFAULTS.copy()
+    validate_immutable_revision(model_revision, "model_revision")
+    validate_immutable_revision(code_revision, "code_revision")
+    validate_remote_code_policy(trust_remote_code, code_revision)
 
     output_dir = Path(output_path)
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -151,8 +164,16 @@ def quantize_awq(
         model_path,
         safetensors=True,
         device_map="auto",
+        trust_remote_code=trust_remote_code,
+        revision=model_revision,
+        code_revision=code_revision,
     )
-    tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
+    tokenizer = AutoTokenizer.from_pretrained(
+        model_path,
+        trust_remote_code=trust_remote_code,
+        revision=model_revision,
+        code_revision=code_revision,
+    )
 
     logger.info("Loading calibration data...")
     calib_texts = load_calibration_data(
@@ -175,6 +196,9 @@ def quantize_awq(
         "quant_config": quant_config,
         "n_calib_samples": n_calib_samples,
         "calib_seq_len": calib_seq_len,
+        "model_revision": model_revision,
+        "code_revision": code_revision,
+        "trust_remote_code": trust_remote_code,
     }
     with open(output_dir / "awq_metadata.json", "w") as f:
         json.dump(meta, f, indent=2)
@@ -195,6 +219,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--version", default="GEMM", choices=["GEMM", "GEMV"], help="AWQ kernel version"
     )
+    parser.add_argument("--model-revision", default=QWEN_25_7B_INSTRUCT_PINNED_REVISION)
+    parser.add_argument("--code-revision", default=QWEN_25_7B_INSTRUCT_PINNED_REVISION)
+    parser.add_argument(
+        "--trust-remote-code",
+        action="store_true",
+        help="Explicitly allow audited remote model code. Use with pinned --code-revision.",
+    )
     return parser.parse_args()
 
 
@@ -213,6 +244,9 @@ def main() -> None:
         quant_config=quant_config,
         n_calib_samples=args.n_calib_samples,
         calib_seq_len=args.calib_seq_len,
+        model_revision=args.model_revision,
+        code_revision=args.code_revision,
+        trust_remote_code=args.trust_remote_code,
     )
 
 

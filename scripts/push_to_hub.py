@@ -43,14 +43,16 @@ MODEL_CARD_TEMPLATE = dedent(
     ```python
     from transformers import AutoModelForCausalLM, AutoTokenizer
 
-    model = AutoModelForCausalLM.from_pretrained("{repo_id}", trust_remote_code=True)
-    tokenizer = AutoTokenizer.from_pretrained("{repo_id}")
+    revision = "<pinned model commit>"
+    model = AutoModelForCausalLM.from_pretrained("{repo_id}", revision=revision)
+    tokenizer = AutoTokenizer.from_pretrained("{repo_id}", revision=revision)
     ```
 
     Or with vLLM:
     ```bash
     python -m vllm.entrypoints.openai.api_server \\
         --model {repo_id} \\
+        --revision <pinned model commit> \\
         --tool-call-parser hermes \\
         --port 8000
     ```

@@ -16,9 +16,9 @@ Use this page as the short path through the repository. It keeps the architectur
 ## Open First
 
 1. Start with the README fast path and architecture section.
-2. Open `docs/service-launch-playbook.md` only when architectureing the product or service angle.
+2. Open `docs/service-launch-playbook.md` when evaluating the product or service angle.
 3. Check the commands below before making claims about quality.
-4. Skim the CI workflows and fixture data before deeper implementation architecture.
+4. Skim the CI workflows and fixture data before a deeper implementation review.
 5. Read the boundaries section before presenting the project externally.
 
 ## Checks
@@ -45,13 +45,13 @@ Use this page as the short path through the repository. It keeps the architectur
 - Training config is explicit
 - GPU paths are separated
 
-## Architecture Notes
+## Delivery Notes
 
 | Possible offer | Working scope assumption |
 |---|---|
 | Model adaptation study | Scope after product intake |
 | BFCL-style evaluation pack | Scope after product intake |
-| Serving readiness architecture | Scope after product intake |
+| Serving readiness review | Scope after product intake |
 
 ## Boundaries
 

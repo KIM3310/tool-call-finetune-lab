@@ -7,10 +7,12 @@ tool definitions and expected tool calls. Saves to data/raw/bfcl.jsonl.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import logging
 from pathlib import Path
 from typing import Any, Dict, List, Optional
+from urllib.parse import urlparse
 
 from tool_call_finetune_lab.config import DataConfig
 
@@ -22,7 +24,7 @@ logger = logging.getLogger(__name__)
 
 BFCL_GITHUB_BASE = (
     "https://raw.githubusercontent.com/ShishirPatil/gorilla"
-    "/main/berkeley-function-call-leaderboard/bfcl_eval/data"
+    "/{revision}/berkeley-function-call-leaderboard/bfcl_eval/data"
 )
 
 # (question_file, answer_file) pairs
@@ -46,14 +48,60 @@ SYSTEM_PROMPT = (
 )
 
 
-def _download_jsonl(url: str) -> List[Dict[str, Any]]:
+def _build_bfcl_raw_url(relative_path: str, revision: str) -> str:
+    """Build a pinned BFCL raw GitHub URL and reject unsafe paths."""
+    if relative_path.startswith("/") or ".." in Path(relative_path).parts:
+        raise ValueError(f"Unsafe BFCL path: {relative_path}")
+    return f"{BFCL_GITHUB_BASE.format(revision=revision)}/{relative_path}"
+
+
+def _expected_bfcl_files() -> set[str]:
+    return {path for pair in BFCL_FILE_PAIRS for path in pair}
+
+
+def _require_bfcl_checksums(checksums: dict[str, str]) -> None:
+    missing = sorted(_expected_bfcl_files() - set(checksums))
+    if missing:
+        raise RuntimeError(f"Missing BFCL checksums for expected shards: {', '.join(missing)}")
+
+
+def _validate_bfcl_download_url(url: str, revision: str, relative_path: str) -> None:
+    """Ensure redirects stay on the expected raw GitHub repository path and revision."""
+    parsed = urlparse(url)
+    expected_path = (
+        f"/ShishirPatil/gorilla/{revision}/"
+        f"berkeley-function-call-leaderboard/bfcl_eval/data/{relative_path}"
+    )
+    if parsed.scheme != "https" or parsed.netloc != "raw.githubusercontent.com":
+        raise ValueError(f"Unexpected BFCL download host: {url}")
+    if parsed.path != expected_path:
+        raise ValueError(
+            "Unexpected BFCL download path or revision: "
+            f"expected {expected_path}, got {parsed.path}"
+        )
+
+
+def _download_jsonl(
+    url: str,
+    expected_sha256: str,
+    revision: str,
+    relative_path: str,
+) -> List[Dict[str, Any]]:
     """Download a JSONL file and return parsed rows."""
     import httpx
 
     resp = httpx.get(url, timeout=60, follow_redirects=True)
     resp.raise_for_status()
+    final_url = str(resp.url)
+    _validate_bfcl_download_url(final_url, revision, relative_path)
+    content = resp.text
+    actual_sha256 = hashlib.sha256(content.encode("utf-8")).hexdigest()
+    if actual_sha256.lower() != expected_sha256.lower():
+        raise ValueError(
+            f"SHA-256 mismatch for {final_url}: expected {expected_sha256}, got {actual_sha256}"
+        )
     rows = []
-    for line in resp.text.strip().splitlines():
+    for line in content.strip().splitlines():
         line = line.strip()
         if line:
             try:
@@ -195,46 +243,73 @@ def _build_example(
 def download_and_convert(config: DataConfig) -> List[Dict[str, Any]]:
     """Download BFCL v4 from GitHub, join with answers, convert to training format."""
     examples: List[Dict[str, Any]] = []
+    downloaded_rows: dict[str, List[Dict[str, Any]]] = {}
 
-    logger.info("Downloading BFCL v4 dataset from GitHub ...")
+    logger.info("Downloading BFCL v4 dataset from GitHub revision %s ...", config.bfcl_revision)
+    _require_bfcl_checksums(config.bfcl_checksums)
+
+    try:
+        for relative_path in sorted(_expected_bfcl_files()):
+            url = _build_bfcl_raw_url(relative_path, config.bfcl_revision)
+            logger.info("  %s ...", relative_path)
+            downloaded_rows[relative_path] = _download_jsonl(
+                url,
+                config.bfcl_checksums[relative_path],
+                config.bfcl_revision,
+                relative_path,
+            )
+    except Exception as e:
+        raise RuntimeError(f"BFCL download failed; no partial BFCL data will be used: {e}") from e
 
     for q_file, a_file in BFCL_FILE_PAIRS:
         category = q_file.replace(".json", "")
-        q_url = f"{BFCL_GITHUB_BASE}/{q_file}"
-        a_url = f"{BFCL_GITHUB_BASE}/{a_file}"
+        q_rows = downloaded_rows[q_file]
+        a_rows = downloaded_rows[a_file]
 
-        try:
-            logger.info("  %s ...", q_file)
-            q_rows = _download_jsonl(q_url)
-            a_rows = _download_jsonl(a_url)
+        logger.info("  %s ...", q_file)
+        # Index answers by id
+        answer_by_id = {r["id"]: r for r in a_rows if "id" in r}
 
-            # Index answers by id
-            answer_by_id = {r["id"]: r for r in a_rows if "id" in r}
+        converted = 0
+        for row in q_rows:
+            row_id = row.get("id", "")
+            answer = answer_by_id.get(row_id)
+            if not answer:
+                continue
+            ex = _build_example(row, answer, category)
+            if ex:
+                ex["provenance"] = {
+                    "source_revision": config.bfcl_revision,
+                    "source_files": [q_file, a_file],
+                    "synthetic_fixture": False,
+                }
+                examples.append(ex)
+                converted += 1
 
-            converted = 0
-            for row in q_rows:
-                row_id = row.get("id", "")
-                answer = answer_by_id.get(row_id)
-                if not answer:
-                    continue
-                ex = _build_example(row, answer, category)
-                if ex:
-                    examples.append(ex)
-                    converted += 1
+        logger.info("    -> %d/%d rows converted from %s", converted, len(q_rows), category)
 
-            logger.info("    -> %d/%d rows converted from %s", converted, len(q_rows), category)
-        except Exception as e:
-            logger.warning("  Failed %s: %s", q_file, e)
+    if not examples and not config.allow_synthetic_fixtures:
+        raise RuntimeError(
+            "No BFCL examples converted. Re-run with allow_synthetic_fixtures=True "
+            "or --allow-synthetic-fixtures only for explicit fixture generation."
+        )
 
     if not examples:
-        logger.warning("No BFCL examples converted. Using synthetic fallback.")
+        logger.warning("No BFCL examples converted. Using explicitly allowed synthetic fixtures.")
         examples = _create_synthetic_examples()
+        for ex in examples:
+            ex["provenance"] = {
+                "source_revision": config.bfcl_revision,
+                "source_files": [],
+                "synthetic_fixture": True,
+            }
 
     if config.max_samples_bfcl and len(examples) > config.max_samples_bfcl:
         import random
 
+        # Deterministic sample cap, not cryptographic use.
         random.seed(config.seed)
-        examples = random.sample(examples, config.max_samples_bfcl)
+        examples = random.sample(examples, config.max_samples_bfcl)  # nosec B311
 
     logger.info("Total BFCL examples: %d", len(examples))
     return examples
@@ -292,11 +367,44 @@ def save_jsonl(examples: List[Dict[str, Any]], output_path: str) -> None:
     with open(path, "w", encoding="utf-8") as f:
         for ex in examples:
             f.write(json.dumps(ex, ensure_ascii=False) + "\n")
+    _write_provenance(path, examples)
     logger.info("Saved %d examples to %s", len(examples), path)
 
 
+def _write_provenance(path: Path, examples: List[Dict[str, Any]]) -> None:
+    content = path.read_bytes()
+    source_revisions = sorted(
+        {
+            str(ex.get("provenance", {}).get("source_revision"))
+            for ex in examples
+            if ex.get("provenance", {}).get("source_revision")
+        }
+    )
+    provenance = {
+        "artifact": str(path),
+        "row_count": len(examples),
+        "sha256": hashlib.sha256(content).hexdigest(),
+        "source_revisions": source_revisions,
+        "synthetic_fixture": any(
+            bool(ex.get("provenance", {}).get("synthetic_fixture")) for ex in examples
+        ),
+    }
+    provenance_path = path.with_suffix(path.suffix + ".provenance.json")
+    provenance_path.write_text(json.dumps(provenance, indent=2) + "\n", encoding="utf-8")
+
+
 def main() -> None:
-    config = DataConfig()
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Prepare pinned BFCL data")
+    parser.add_argument("--allow-synthetic-fixtures", action="store_true")
+    parser.add_argument("--bfcl-revision", default=None)
+    args = parser.parse_args()
+
+    kwargs: Dict[str, Any] = {"allow_synthetic_fixtures": args.allow_synthetic_fixtures}
+    if args.bfcl_revision:
+        kwargs["bfcl_revision"] = args.bfcl_revision
+    config = DataConfig(**kwargs)
     examples = download_and_convert(config)
     save_jsonl(examples, config.bfcl_output)
     logger.info("BFCL preparation complete.")

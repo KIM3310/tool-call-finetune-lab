@@ -3,10 +3,9 @@
 ## Public Demo
 
 - URL: https://kim3310.github.io/tool-call-finetune-lab/
-- Scope: credential-free synthetic demo surface for quick architecture inspection inspection.
+- Scope: credential-free synthetic demonstration of the training, evaluation, and serving path.
 
 Repository: `tool-call-finetune-lab`
-Last updated: 2026-06-03 KST
 
 ## Enterprise Product Position
 
@@ -38,7 +37,7 @@ This repository is packaged as a concrete system surface, not a loose code sampl
 | --- | --- |
 | Local verification | `make verify` |
 | Runtime stack | Python, Makefile automation |
-| Demo readiness | README, architecture docs, and proof assets should explain the first five minutes of evaluation. |
+| Demo documentation | README, architecture docs, and proof assets should explain the first five minutes of evaluation. |
 | Support handoff | Capture setup, known limits, recovery steps, and customer-specific extension points before a production test. |
 | Release discipline | Do not ship dependency mega-bumps, workflow edits, or demo URL changes without rerunning repository validators and project checks. |
 
@@ -52,4 +51,4 @@ This repository is packaged as a concrete system surface, not a loose code sampl
 
 ## Service Next Step
 
-Turn the repo into a customer-facing offer by pairing the proof surface with one discovery question, one measurable success metric, and one bounded follow-up path. The smallest viable package should be easy to verify and bounded enough to deliver without custom platform work.
+Turn the repo into a customer-facing offer by pairing the proof surface with one clear problem statement, one measurable success metric, and one bounded follow-up path. The smallest viable package should be easy to verify and bounded enough to deliver without custom platform work.

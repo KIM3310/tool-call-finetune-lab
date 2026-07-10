@@ -122,6 +122,156 @@ def sample_examples() -> List[Dict[str, Any]]:
 
 
 class TestBFCLParser:
+    def test_bfcl_download_fails_closed_without_synthetic_opt_in(
+        self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+    ) -> None:
+        from tool_call_finetune_lab.config import DataConfig
+        from tool_call_finetune_lab.data import prepare_bfcl
+
+        def fail_download(*args: Any, **kwargs: Any) -> List[Dict[str, Any]]:
+            raise RuntimeError(f"blocked {args} {kwargs}")
+
+        monkeypatch.setattr(prepare_bfcl, "_download_jsonl", fail_download)
+        cfg = DataConfig(raw_dir=str(tmp_path / "raw"), processed_dir=str(tmp_path / "processed"))
+
+        with pytest.raises(RuntimeError, match="BFCL download failed"):
+            prepare_bfcl.download_and_convert(cfg)
+
+    def test_bfcl_requires_checksum_for_every_expected_shard(self, tmp_path: Path) -> None:
+        from tool_call_finetune_lab.config import DataConfig
+        from tool_call_finetune_lab.data import prepare_bfcl
+
+        cfg = DataConfig(
+            raw_dir=str(tmp_path / "raw"),
+            processed_dir=str(tmp_path / "processed"),
+            bfcl_checksums={"BFCL_v4_simple_python.json": "0" * 64},
+        )
+
+        with pytest.raises(RuntimeError, match="Missing BFCL checksums"):
+            prepare_bfcl.download_and_convert(cfg)
+
+    def test_bfcl_later_shard_failure_discards_earlier_success(
+        self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+    ) -> None:
+        from tool_call_finetune_lab.config import DataConfig
+        from tool_call_finetune_lab.data import prepare_bfcl
+
+        downloaded: list[str] = []
+        fail_after = 2
+
+        def fake_download(*args: Any, **kwargs: Any) -> List[Dict[str, Any]]:
+            url = str(args[0])
+            downloaded.append(url)
+            if len(downloaded) <= fail_after:
+                return []
+            raise RuntimeError("later shard unavailable")
+
+        monkeypatch.setattr(prepare_bfcl, "_download_jsonl", fake_download)
+        cfg = DataConfig(raw_dir=str(tmp_path / "raw"), processed_dir=str(tmp_path / "processed"))
+
+        with pytest.raises(RuntimeError, match="BFCL download failed"):
+            prepare_bfcl.download_and_convert(cfg)
+
+        assert len(downloaded) > 2
+
+    def test_bfcl_synthetic_opt_in_marks_provenance(
+        self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+    ) -> None:
+        from tool_call_finetune_lab.config import DataConfig
+        from tool_call_finetune_lab.data import prepare_bfcl
+
+        def empty_download(*args: Any, **kwargs: Any) -> List[Dict[str, Any]]:
+            return []
+
+        monkeypatch.setattr(prepare_bfcl, "_download_jsonl", empty_download)
+        cfg = DataConfig(
+            raw_dir=str(tmp_path / "raw"),
+            processed_dir=str(tmp_path / "processed"),
+            allow_synthetic_fixtures=True,
+        )
+
+        examples = prepare_bfcl.download_and_convert(cfg)
+
+        assert examples
+        assert examples[0]["provenance"]["synthetic_fixture"] is True
+        assert examples[0]["provenance"]["source_revision"] == cfg.bfcl_revision
+
+    def test_bfcl_raw_url_uses_pinned_revision_and_validates_path(self) -> None:
+        from tool_call_finetune_lab.data.prepare_bfcl import _build_bfcl_raw_url
+
+        revision = "0123456789abcdef0123456789abcdef01234567"
+        url = _build_bfcl_raw_url("BFCL_v4_simple_python.json", revision)
+
+        assert "/main/" not in url
+        assert f"/{revision}/berkeley-function-call-leaderboard/bfcl_eval/data/" in url
+
+        with pytest.raises(ValueError, match="Unsafe BFCL path"):
+            _build_bfcl_raw_url("../secret.json", revision)
+
+    def test_download_jsonl_validates_checksum(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        from tool_call_finetune_lab.data.prepare_bfcl import _download_jsonl
+
+        class Response:
+            text = '{"id": "ok"}\n'
+            url = (
+                "https://raw.githubusercontent.com/ShishirPatil/gorilla/"
+                "0123456789abcdef0123456789abcdef01234567/"
+                "berkeley-function-call-leaderboard/bfcl_eval/data/BFCL_v4_simple_python.json"
+            )
+
+            def raise_for_status(self) -> None:
+                return None
+
+        def fake_get(*args: Any, **kwargs: Any) -> Response:
+            return Response()
+
+        import httpx
+
+        monkeypatch.setattr(httpx, "get", fake_get)
+
+        with pytest.raises(ValueError, match="SHA-256 mismatch"):
+            _download_jsonl(
+                Response.url,
+                "0" * 64,
+                "0123456789abcdef0123456789abcdef01234567",
+                "BFCL_v4_simple_python.json",
+            )
+
+    def test_download_jsonl_rejects_same_repo_redirect_to_main(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        from tool_call_finetune_lab.config import BFCL_PINNED_REVISION
+        from tool_call_finetune_lab.data.prepare_bfcl import _download_jsonl
+
+        class Response:
+            text = '{"id": "ok"}\n'
+            url = (
+                "https://raw.githubusercontent.com/ShishirPatil/gorilla/main/"
+                "berkeley-function-call-leaderboard/bfcl_eval/data/BFCL_v4_simple_python.json"
+            )
+
+            def raise_for_status(self) -> None:
+                return None
+
+        def fake_get(*args: Any, **kwargs: Any) -> Response:
+            return Response()
+
+        import httpx
+
+        monkeypatch.setattr(httpx, "get", fake_get)
+
+        with pytest.raises(ValueError, match="revision"):
+            _download_jsonl(
+                (
+                    "https://raw.githubusercontent.com/ShishirPatil/gorilla/"
+                    f"{BFCL_PINNED_REVISION}/berkeley-function-call-leaderboard/"
+                    "bfcl_eval/data/BFCL_v4_simple_python.json"
+                ),
+                "0" * 64,
+                BFCL_PINNED_REVISION,
+                "BFCL_v4_simple_python.json",
+            )
+
     def test_build_example_basic(self) -> None:
         from tool_call_finetune_lab.data.prepare_bfcl import _build_example
 
@@ -236,6 +386,116 @@ class TestBFCLParser:
 
 
 class TestGlaiveParser:
+    def test_glaive_download_uses_pinned_revision_and_fails_closed(
+        self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+    ) -> None:
+        from tool_call_finetune_lab.config import DataConfig
+        from tool_call_finetune_lab.data import prepare_glaive
+
+        captured: Dict[str, Any] = {}
+
+        def fake_hf_hub_download(*args: Any, **kwargs: Any) -> Any:
+            captured["args"] = args
+            captured["kwargs"] = kwargs
+            raise RuntimeError("network blocked")
+
+        monkeypatch.setattr(prepare_glaive, "hf_hub_download", fake_hf_hub_download)
+        cfg = DataConfig(
+            raw_dir=str(tmp_path / "raw"),
+            processed_dir=str(tmp_path / "processed"),
+        )
+
+        with pytest.raises(RuntimeError, match="Failed to download Glaive dataset"):
+            prepare_glaive.download_and_convert(cfg)
+
+        assert captured["kwargs"]["revision"] == cfg.dataset_revision
+        assert captured["kwargs"]["filename"] == cfg.glaive_filename
+        assert captured["kwargs"]["repo_type"] == "dataset"
+
+    def test_glaive_synthetic_opt_in_marks_provenance(
+        self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+    ) -> None:
+        from tool_call_finetune_lab.config import DataConfig
+        from tool_call_finetune_lab.data import prepare_glaive
+
+        def fake_hf_hub_download(*args: Any, **kwargs: Any) -> Any:
+            raise RuntimeError("network blocked")
+
+        monkeypatch.setattr(prepare_glaive, "hf_hub_download", fake_hf_hub_download)
+        cfg = DataConfig(
+            raw_dir=str(tmp_path / "raw"),
+            processed_dir=str(tmp_path / "processed"),
+            allow_synthetic_fixtures=True,
+        )
+
+        examples = prepare_glaive.download_and_convert(cfg)
+
+        assert examples
+        assert examples[0]["provenance"]["synthetic_fixture"] is True
+        assert examples[0]["provenance"]["source_revision"] == cfg.dataset_revision
+        assert examples[0]["provenance"]["source_sha256"] is None
+
+    def test_glaive_source_checksum_is_verified_before_parsing(
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+        tmp_path: Path,
+        sample_glaive_row: Dict[str, Any],
+    ) -> None:
+        import hashlib
+
+        from tool_call_finetune_lab.config import DataConfig
+        from tool_call_finetune_lab.data import prepare_glaive
+
+        source = tmp_path / "glaive.json"
+        source.write_text("verified source", encoding="utf-8")
+        expected_sha256 = hashlib.sha256(source.read_bytes()).hexdigest()
+        captured: Dict[str, Any] = {}
+
+        monkeypatch.setattr(prepare_glaive, "hf_hub_download", lambda **_kwargs: str(source))
+
+        def fake_load_dataset(*args: Any, **kwargs: Any) -> Any:
+            captured["args"] = args
+            captured["kwargs"] = kwargs
+            return [sample_glaive_row]
+
+        monkeypatch.setattr(prepare_glaive, "load_dataset", fake_load_dataset)
+        cfg = DataConfig(
+            raw_dir=str(tmp_path / "raw"),
+            processed_dir=str(tmp_path / "processed"),
+            glaive_sha256=expected_sha256,
+        )
+
+        examples = prepare_glaive.download_and_convert(cfg)
+
+        assert captured == {
+            "args": ("json",),
+            "kwargs": {"data_files": str(source), "split": "train"},
+        }
+        assert examples[0]["provenance"]["source_sha256"] == expected_sha256
+
+    def test_glaive_source_checksum_mismatch_fails_closed(
+        self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+    ) -> None:
+        from tool_call_finetune_lab.config import DataConfig
+        from tool_call_finetune_lab.data import prepare_glaive
+
+        source = tmp_path / "glaive.json"
+        source.write_text("unexpected source", encoding="utf-8")
+        monkeypatch.setattr(prepare_glaive, "hf_hub_download", lambda **_kwargs: str(source))
+        monkeypatch.setattr(
+            prepare_glaive,
+            "load_dataset",
+            lambda *_args, **_kwargs: pytest.fail("checksum must be verified before parsing"),
+        )
+        cfg = DataConfig(
+            raw_dir=str(tmp_path / "raw"),
+            processed_dir=str(tmp_path / "processed"),
+            glaive_sha256="0" * 64,
+        )
+
+        with pytest.raises(RuntimeError, match="SHA-256 mismatch"):
+            prepare_glaive.download_and_convert(cfg)
+
     def test_parse_glaive_conversation_basic(self, sample_glaive_row: Dict[str, Any]) -> None:
         from tool_call_finetune_lab.data.prepare_glaive import _parse_glaive_conversation
 
@@ -406,6 +666,10 @@ class TestMergeAndSplit:
         save_jsonl(sample_examples[:5], str(out))
         loaded = load_jsonl(str(out))
         assert len(loaded) == 5
+        provenance = json.loads((tmp_path / "out.jsonl.provenance.json").read_text())
+        assert provenance["row_count"] == 5
+        assert len(provenance["sha256"]) == 64
+        assert provenance["synthetic_fixture"] is False
 
 
 # ---------------------------------------------------------------------------

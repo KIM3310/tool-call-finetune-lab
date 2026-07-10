@@ -1,0 +1,47 @@
+# Standalone production service for publishing vLLM outside loopback.
+#
+# The API key and host bind are required. Deploy behind a reverse proxy/TLS
+# boundary and firewall rules that restrict endpoint access.
+# Example:
+#   VLLM_PRODUCTION_HOST_BIND=0.0.0.0 VLLM_API_KEY=<random-secret> \
+#     docker compose -f docker-compose.production.yml up vllm-server
+
+services:
+  vllm-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: serving
+    image: tool-call-finetune-lab:serving
+    container_name: vllm-server
+    restart: unless-stopped
+    ports:
+      - "${VLLM_PRODUCTION_HOST_BIND:?Set explicit production bind host}:8000:8000"
+    volumes:
+      - "${MODEL_PATH:-./outputs/awq-model}:/model:ro"
+    environment:
+      MODEL_PATH: /model
+      VLLM_HOST: "0.0.0.0"
+      VLLM_ALLOW_PUBLIC_BIND: "1"
+      VLLM_PORT: "8000"
+      VLLM_API_KEY: "${VLLM_API_KEY:?Set a random API key with at least 16 characters}"
+      SERVED_MODEL_NAME: "${SERVED_MODEL_NAME:-qwen2.5-7b-tool-call}"
+      TENSOR_PARALLEL: "${TENSOR_PARALLEL:-1}"
+      MAX_MODEL_LEN: "${MAX_MODEL_LEN:-4096}"
+      GPU_MEMORY_UTILIZATION: "${GPU_MEMORY_UTILIZATION:-0.90}"
+      HF_TOKEN: "${HF_TOKEN:-}"
+      HUGGING_FACE_HUB_TOKEN: "${HF_TOKEN:-}"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: "${TENSOR_PARALLEL:-1}"
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
+    shm_size: "2gb"

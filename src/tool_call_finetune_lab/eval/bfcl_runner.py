@@ -22,6 +22,12 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
+from tool_call_finetune_lab.config import (
+    QWEN_25_7B_INSTRUCT_PINNED_REVISION,
+    validate_immutable_revision,
+    validate_remote_code_policy,
+)
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
@@ -174,17 +180,35 @@ class VLLMBackend:
 class LocalHFBackend:
     """Run inference locally with a HuggingFace model."""
 
-    def __init__(self, model_path: str, max_seq_length: int = 4096) -> None:
+    def __init__(
+        self,
+        model_path: str,
+        max_seq_length: int = 4096,
+        model_revision: str = QWEN_25_7B_INSTRUCT_PINNED_REVISION,
+        code_revision: str = QWEN_25_7B_INSTRUCT_PINNED_REVISION,
+        trust_remote_code: bool = False,
+    ) -> None:
         import torch
         from transformers import AutoModelForCausalLM, AutoTokenizer
 
+        validate_immutable_revision(model_revision, "model_revision")
+        validate_immutable_revision(code_revision, "code_revision")
+        validate_remote_code_policy(trust_remote_code, code_revision)
+
         logger.info("Loading model from %s for local inference...", model_path)
-        self.tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
+        self.tokenizer = AutoTokenizer.from_pretrained(
+            model_path,
+            trust_remote_code=trust_remote_code,
+            revision=model_revision,
+            code_revision=code_revision,
+        )
         self.model = AutoModelForCausalLM.from_pretrained(
             model_path,
             torch_dtype=torch.bfloat16,
             device_map="auto",
-            trust_remote_code=True,
+            trust_remote_code=trust_remote_code,
+            revision=model_revision,
+            code_revision=code_revision,
         )
         self.max_seq_length = max_seq_length
 
@@ -379,6 +403,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--test-file", default="data/processed/test.jsonl")
     parser.add_argument("--results-file", default="results/bfcl_results.json")
     parser.add_argument("--max-examples", type=int, default=None)
+    parser.add_argument("--model-revision", default=QWEN_25_7B_INSTRUCT_PINNED_REVISION)
+    parser.add_argument("--code-revision", default=QWEN_25_7B_INSTRUCT_PINNED_REVISION)
+    parser.add_argument(
+        "--trust-remote-code",
+        action="store_true",
+        help="Explicitly allow audited remote model code. Use with pinned --code-revision.",
+    )
     return parser.parse_args()
 
 
@@ -405,7 +436,12 @@ def main() -> None:
         backend = VLLMBackend(cfg.vllm_base_url, cfg.model_name)
     else:
         logger.info("Using local HF backend from %s", args.model_path)
-        backend = LocalHFBackend(args.model_path)  # type: ignore[assignment]
+        backend = LocalHFBackend(  # type: ignore[assignment]
+            args.model_path,
+            model_revision=args.model_revision,
+            code_revision=args.code_revision,
+            trust_remote_code=args.trust_remote_code,
+        )
 
     # Run evaluation
     results = evaluate(backend, test_examples)
