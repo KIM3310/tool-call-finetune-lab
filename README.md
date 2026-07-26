@@ -233,6 +233,7 @@ Apache-2.0 -- see [LICENSE](LICENSE).
 - Paid boundary: paid dataset preparation pack, eval report, and private fine-tuning runbook
 - Canonical URL: https://kim3310.github.io/tool-call-finetune-lab/
 - Lead capture: https://github.com/KIM3310/tool-call-finetune-lab/issues/new?template=service-inquiry.yml&title=Private+workspace+inquiry%3A+Tool-Call+Fine-Tune+Lab
+- Commercial route: https://kim3310-doeon-kim-portfolio.pages.dev/?offer=tool-call-finetune-lab#service-offers
 - Machine-readable offer: [docs/service-offer.json](docs/service-offer.json)
 - Search growth implementation: [docs/search-growth-implementation.md](docs/search-growth-implementation.md)
 - Revenue architecture: [docs/revenue-architecture.md](docs/revenue-architecture.md)

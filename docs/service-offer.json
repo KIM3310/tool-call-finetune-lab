@@ -69,5 +69,29 @@
     ],
     "isAccessibleForFree": true,
     "keywords": "tool-call-finetune-lab, Tool-Call, Fine-Tune, Lab, fine-tuning, eval, pipeline, tool-call, datasets, BFCL-style, tests, serving, checks, dataset, preparation, pack, runbook, open-source, sample, tier"
+  },
+  "commerce": {
+    "gateway_url": "https://kim3310-doeon-kim-portfolio.pages.dev/?offer=tool-call-finetune-lab#service-offers",
+    "lane_id": "stagepilot-reliability-lab",
+    "lane_name": "StagePilot Reliability Lab",
+    "billing_mode": "one-time",
+    "price_unit": "reliability report pack from USD 500",
+    "fulfillment_kind": "private scenario suite, trace review, retry and parser findings, and provider scorecard",
+    "risk_bucket": "standard-b2b",
+    "checkout": {
+      "provider": "lemon-squeezy",
+      "status": "account-onboarding-required",
+      "fallback_url": "https://kim3310-doeon-kim-portfolio.pages.dev/?offer=tool-call-finetune-lab#service-offers"
+    },
+    "sponsorship": {
+      "provider": "github-sponsors",
+      "eligible": true,
+      "status": "account-onboarding-required"
+    },
+    "advertising": {
+      "provider": null,
+      "eligible": false,
+      "status": "not-applicable"
+    }
   }
 }
