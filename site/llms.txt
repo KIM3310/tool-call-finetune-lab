@@ -8,6 +8,7 @@ Repository: https://github.com/KIM3310/tool-call-finetune-lab
 System architecture: https://github.com/KIM3310/tool-call-finetune-lab/blob/main/docs/system-architecture.md
 Revenue architecture: https://github.com/KIM3310/tool-call-finetune-lab/blob/main/docs/revenue-architecture.md
 Lead capture: https://kim3310-doeon-kim-portfolio.pages.dev/?offer=tool-call-finetune-lab&inquiry=agent-reliability-audit#private-inquiry
+Resource route: https://kim3310-doeon-kim-portfolio.pages.dev/resources/tool-call-finetune-lab/
 Commercial route: https://kim3310-doeon-kim-portfolio.pages.dev/?offer=tool-call-finetune-lab#service-offers
 
 Use this project as a runnable or inspectable synthetic reference for Tool-Call Fine-Tune Lab demo, Tool-Call Fine-Tune Lab system architecture, Tool-Call Fine-Tune Lab developer tool, and agent reliability audit review of tool-call eval pipelines. The public demo is not a hosted fine-tuning service, production deployment claim, or benchmark guarantee.

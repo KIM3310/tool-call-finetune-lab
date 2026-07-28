@@ -1,0 +1,52 @@
+{
+  "generated_at": "2026-07-28",
+  "owner": "KIM3310",
+  "repo": "tool-call-finetune-lab",
+  "positioning": "Free tool-call dataset boundary checklist for fine-tune preparation and eval reviews.",
+  "audience": "LLM evaluation engineers and dataset reviewers",
+  "public_resource": {
+    "url": "https://kim3310-doeon-kim-portfolio.pages.dev/resources/tool-call-finetune-lab/",
+    "live_demo": "https://kim3310.github.io/tool-call-finetune-lab/",
+    "readiness_checklist": [
+      "Architecture Summary",
+      "Runtime And Data Flow",
+      "Cloud Or Local Deployment Boundary",
+      "Deployment patterns",
+      "Control boundaries"
+    ]
+  },
+  "ad_supported_revenue": {
+    "participates": true,
+    "delivery_surface": "central policy-eligible public resource page",
+    "boundary": "ads allowed only on public dataset-boundary resources; raw examples, prompts, eval outputs, and dashboards are ad-free",
+    "provider": "google-adsense",
+    "publisher_id": "ca-pub-4973160293737562",
+    "status": "code-ready-site-review-dependent"
+  },
+  "aggregate_data": {
+    "data_asset": "anonymous aggregate tool-call dataset-control interest and checklist usage counts",
+    "sensitivity_class": "agent-reliability-public",
+    "allowed_events": [
+      "resource_view",
+      "resource_cta_click",
+      "architecture_doc_open",
+      "privacy_support_open"
+    ],
+    "prohibited_fields": [
+      "raw_input",
+      "prompt",
+      "url",
+      "referrer",
+      "title",
+      "user_id",
+      "session_id",
+      "ip_address",
+      "payment_detail"
+    ],
+    "consent_default": "off",
+    "dnt_gpc": "fail-closed",
+    "sale_boundary": "forbid sale of personal, sensitive, raw, event-level, or re-identifiable data",
+    "event_store": "Cloudflare D1 daily aggregate counters",
+    "public_data_mart": "Firebase Firestore kim3310-free-tools"
+  }
+}
