@@ -7,11 +7,12 @@ This document turns the repository architecture into a zero-to-low-cost service 
 | Layer | Decision |
 | --- | --- |
 | Target buyer / user | AI engineer or platform team improving function-calling reliability for open models |
-| Productized offer | fine-tuning and eval pipeline for tool-call datasets, BFCL-style tests, and serving checks |
-| First paid SKU | paid dataset preparation pack, eval report, and private fine-tuning runbook |
+| Productized offer | agent reliability audit for tool-call fine-tuning pipelines, BFCL-style evaluation, schema fidelity, and serving readiness |
+| First paid SKU | fixed-scope Agent Reliability Audit |
 | Free lead magnet | free open-source pipeline and sample eval reports |
-| Paid expansion | private dataset conversion, hosted eval dashboard, and training support package |
+| Paid expansion | private scenario suite, trace review, failure taxonomy, provider scorecard, and prioritized remediation plan |
 | Data / workflow moat | dataset transforms, tool-call parsers, benchmark histories, and model-specific failure analysis |
+| Private inquiry | https://kim3310-doeon-kim-portfolio.pages.dev/?offer=tool-call-finetune-lab&inquiry=agent-reliability-audit#private-inquiry |
 
 ## Free-Tier-First Launch Stack
 
@@ -52,7 +53,7 @@ flowchart LR
 ## 30-Day Revenue Test
 
 1. Publish the public demo or architecture page with one clear CTA: request private workspace, download a pack, or run a sample report.
-2. Add a lead capture route using Workers + D1/KV, Supabase, Firebase, or a GitHub issue form.
+2. Route confidential and commercial requests through the [central Cloudflare D1 private inquiry](https://kim3310-doeon-kim-portfolio.pages.dev/?offer=tool-call-finetune-lab&inquiry=agent-reliability-audit#private-inquiry); keep public GitHub issues limited to non-confidential product discussion.
 3. Create one downloadable artifact: report PDF, template pack, runbook, dataset sample, or export bundle.
 4. Offer a fixed-scope paid package before building subscription complexity.
 5. Track activation manually first: visits, CTA clicks, export requests, email replies, and paid pilot conversations.

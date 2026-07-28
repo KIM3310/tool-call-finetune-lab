@@ -5,23 +5,23 @@
   "repository_url": "https://github.com/KIM3310/tool-call-finetune-lab",
   "architecture_url": "https://github.com/KIM3310/tool-call-finetune-lab/blob/main/docs/system-architecture.md",
   "revenue_architecture_url": "https://github.com/KIM3310/tool-call-finetune-lab/blob/main/docs/revenue-architecture.md",
-  "lead_capture_url": "https://github.com/KIM3310/tool-call-finetune-lab/issues/new?template=service-inquiry.yml&title=Private+workspace+inquiry%3A+Tool-Call+Fine-Tune+Lab",
-  "productized_offer": "fine-tuning and eval pipeline for tool-call datasets, BFCL-style tests, and serving checks",
-  "first_paid_sku": "paid dataset preparation pack, eval report, and private fine-tuning runbook",
+  "lead_capture_url": "https://kim3310-doeon-kim-portfolio.pages.dev/?offer=tool-call-finetune-lab&inquiry=agent-reliability-audit#private-inquiry",
+  "productized_offer": "agent reliability audit for tool-call fine-tuning pipelines, BFCL-style evaluation, schema fidelity, and serving readiness",
+  "first_paid_sku": "fixed-scope Agent Reliability Audit",
   "free_lead_magnet": "free open-source pipeline and sample eval reports",
   "search_positioning": {
-    "primary_query": "Tool-Call Fine-Tune Lab fine-tuning eval pipeline",
+    "primary_query": "Agent Reliability Audit for tool-call fine-tuning",
     "secondary_queries": [
       "Tool-Call Fine-Tune Lab demo",
       "Tool-Call Fine-Tune Lab system architecture",
       "Tool-Call Fine-Tune Lab developer tool",
-      "fine-tuning and eval pipeline for tool-call datasets, BFCL-style tests, and serving checks service"
+      "agent reliability audit for tool-call eval pipelines"
     ],
     "audience_intent": "Find a runnable demo, inspect the system architecture, and decide whether a private workspace or implementation package is useful."
   },
   "monetization_boundary": {
     "free": "free open-source pipeline and sample eval reports",
-    "paid": "paid dataset preparation pack, eval report, and private fine-tuning runbook",
+    "paid": "fixed-scope Agent Reliability Audit for private scenario suites, trace review, failure taxonomy, provider scorecard, and prioritized remediation plan",
     "metering_hooks": [
       "workspace_id",
       "plan",
@@ -45,7 +45,7 @@
     "operatingSystem": "Web, serverless, and local development environments",
     "url": "https://kim3310.github.io/tool-call-finetune-lab/",
     "codeRepository": "https://github.com/KIM3310/tool-call-finetune-lab",
-    "description": "Tool-Call Fine-Tune Lab: fine-tuning and eval pipeline for tool-call datasets, BFCL-style tests, and serving checks. Free entry point: free open-source pipeline and sample eval reports. Paid path: paid dataset.",
+    "description": "Tool-Call Fine-Tune Lab supports an agent reliability audit surface for tool-call fine-tuning pipelines, BFCL-style evaluation, schema fidelity, and serving readiness. The public demo is credential-free and synthetic; private work uses the central Agent Reliability Audit inquiry lane.",
     "creator": {
       "@type": "Person",
       "name": "KIM3310",
@@ -62,30 +62,30 @@
       },
       {
         "@type": "Offer",
-        "name": "paid dataset preparation pack, eval report, and private fine-tuning runbook",
+        "name": "fixed-scope Agent Reliability Audit",
         "availability": "https://schema.org/LimitedAvailability",
-        "url": "https://github.com/KIM3310/tool-call-finetune-lab/blob/main/docs/revenue-architecture.md"
+        "url": "https://kim3310-doeon-kim-portfolio.pages.dev/?offer=tool-call-finetune-lab&inquiry=agent-reliability-audit#private-inquiry"
       }
     ],
     "isAccessibleForFree": true,
-    "keywords": "tool-call-finetune-lab, Tool-Call, Fine-Tune, Lab, fine-tuning, eval, pipeline, tool-call, datasets, BFCL-style, tests, serving, checks, dataset, preparation, pack, runbook, open-source, sample, tier"
+    "keywords": "tool-call-finetune-lab, agent reliability audit, tool-call fine-tuning, BFCL-style evaluation, schema fidelity, serving readiness, synthetic demo, private scenario suite"
   },
   "commerce": {
     "gateway_url": "https://kim3310-doeon-kim-portfolio.pages.dev/?offer=tool-call-finetune-lab#service-offers",
-    "lane_id": "stagepilot-reliability-lab",
-    "lane_name": "StagePilot Reliability Lab",
+    "lane_id": "agent-reliability-audit",
+    "lane_name": "Agent Reliability Audit",
     "billing_mode": "one-time",
-    "price_unit": "reliability report pack from USD 500",
-    "fulfillment_kind": "private scenario suite, trace review, retry and parser findings, and provider scorecard",
+    "price_unit": "fixed audit from USD 1,500",
+    "fulfillment_kind": "private scenario suite, trace review, failure taxonomy, provider scorecard, and prioritized remediation plan",
     "risk_bucket": "standard-b2b",
     "checkout": {
-      "provider": "lemon-squeezy",
-      "status": "account-onboarding-required",
-      "fallback_url": "https://kim3310-doeon-kim-portfolio.pages.dev/?offer=tool-call-finetune-lab#service-offers"
+      "provider": null,
+      "status": "not-configured",
+      "fallback_url": "https://kim3310-doeon-kim-portfolio.pages.dev/?offer=tool-call-finetune-lab&inquiry=agent-reliability-audit#private-inquiry"
     },
     "sponsorship": {
       "provider": "github-sponsors",
-      "eligible": true,
+      "eligible": false,
       "status": "sponsors-listing-not-configured"
     },
     "advertising": {

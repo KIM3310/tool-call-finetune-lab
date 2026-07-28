@@ -1,9 +1,11 @@
 # Tool-Call Fine-Tune Lab
 
-## Live Demo
+## Agent Reliability Audit Surface
 
 - [Open the public GitHub Pages demo](https://kim3310.github.io/tool-call-finetune-lab/)
-- Scope: credential-free, synthetic-data demonstration of the dataset, evaluation, and serving workflow.
+- Scope: credential-free, synthetic-data preview of the dataset, evaluation, and serving workflow.
+- Private CTA: request a fixed-scope [Agent Reliability Audit](https://kim3310-doeon-kim-portfolio.pages.dev/?offer=tool-call-finetune-lab&inquiry=agent-reliability-audit#private-inquiry) using the central private inquiry lane.
+- Demo boundary: the public page shows synthetic tool-call eval examples and implementation notes. It is not a hosted fine-tuning service, customer dataset review, production deployment claim, or benchmark guarantee.
 
 [![CI](https://github.com/KIM3310/tool-call-finetune-lab/actions/workflows/ci.yml/badge.svg)](https://github.com/KIM3310/tool-call-finetune-lab/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/KIM3310/tool-call-finetune-lab/branch/main/graph/badge.svg)](https://codecov.io/gh/KIM3310/tool-call-finetune-lab)
@@ -230,9 +232,9 @@ Apache-2.0 -- see [LICENSE](LICENSE).
 ## Search And Service Surface
 
 - Public entry: free open-source pipeline and sample eval reports
-- Paid boundary: paid dataset preparation pack, eval report, and private fine-tuning runbook
+- Paid boundary: fixed-scope Agent Reliability Audit for private scenario suites, trace review, failure taxonomy, provider scorecard, and prioritized remediation plan
 - Canonical URL: https://kim3310.github.io/tool-call-finetune-lab/
-- Lead capture: https://github.com/KIM3310/tool-call-finetune-lab/issues/new?template=service-inquiry.yml&title=Private+workspace+inquiry%3A+Tool-Call+Fine-Tune+Lab
+- Lead capture: https://kim3310-doeon-kim-portfolio.pages.dev/?offer=tool-call-finetune-lab&inquiry=agent-reliability-audit#private-inquiry
 - Commercial route: https://kim3310-doeon-kim-portfolio.pages.dev/?offer=tool-call-finetune-lab#service-offers
 - Machine-readable offer: [docs/service-offer.json](docs/service-offer.json)
 - Search growth implementation: [docs/search-growth-implementation.md](docs/search-growth-implementation.md)

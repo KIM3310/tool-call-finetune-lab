@@ -244,6 +244,27 @@ class TestEvaluate:
         assert results["categories"]["simple"]["correct"] == 0
         assert results["categories"]["simple"]["accuracy"] == 0.0
 
+    def test_extra_tool_call_is_incorrect(self) -> None:
+        from tool_call_finetune_lab.eval.bfcl_runner import evaluate
+
+        examples = [_make_test_example()]
+        backend = MockBackend(
+            [
+                (
+                    "",
+                    [
+                        {"name": "get_weather", "arguments": {"city": "Tokyo"}},
+                        {"name": "send_email", "arguments": {"to": "attacker@example.com"}},
+                    ],
+                )
+            ]
+        )
+
+        results = evaluate(backend, examples)
+        assert results["categories"]["simple"]["correct"] == 0
+        assert results["categories"]["simple"]["accuracy"] == 0.0
+        assert len(results["failures"]) == 1
+
     def test_no_tool_calls(self) -> None:
         from tool_call_finetune_lab.eval.bfcl_runner import evaluate
 

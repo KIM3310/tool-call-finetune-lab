@@ -10,23 +10,23 @@ This repository now exposes a search-readable service surface in addition to the
 | Revenue architecture | [docs/revenue-architecture.md](./revenue-architecture.md) |
 | System architecture | [docs/system-architecture.md](./system-architecture.md) |
 | Public canonical URL | https://kim3310.github.io/tool-call-finetune-lab/ |
-| Lead capture URL | https://github.com/KIM3310/tool-call-finetune-lab/issues/new?template=service-inquiry.yml&title=Private+workspace+inquiry%3A+Tool-Call+Fine-Tune+Lab |
+| Lead capture URL | https://kim3310-doeon-kim-portfolio.pages.dev/?offer=tool-call-finetune-lab&inquiry=agent-reliability-audit#private-inquiry |
 | Commercial route | https://kim3310-doeon-kim-portfolio.pages.dev/?offer=tool-call-finetune-lab#service-offers |
 
 ## Search Positioning
 
-- Primary query: Tool-Call Fine-Tune Lab fine-tuning eval pipeline
-- Secondary queries: Tool-Call Fine-Tune Lab demo; Tool-Call Fine-Tune Lab system architecture; Tool-Call Fine-Tune Lab developer tool; fine-tuning and eval pipeline for tool-call datasets, BFCL-style tests, and serving checks service
+- Primary query: Agent Reliability Audit for tool-call fine-tuning
+- Secondary queries: Tool-Call Fine-Tune Lab demo; Tool-Call Fine-Tune Lab system architecture; Tool-Call Fine-Tune Lab developer tool; agent reliability audit for tool-call eval pipelines
 - Public entry point: free open-source pipeline and sample eval reports
-- Paid boundary: paid dataset preparation pack, eval report, and private fine-tuning runbook
+- Paid boundary: fixed-scope Agent Reliability Audit for private scenario suites, trace review, failure taxonomy, provider scorecard, and prioritized remediation plan
 
 ## Conversion Boundary
 
-The public surface stays crawlable and free. Paid value starts when a visitor wants private data, saved history, branded export packs, customer-specific connectors, recurring reports, or implementation support.
+The public surface stays crawlable, credential-free, and synthetic. Paid value starts when a visitor wants the central private inquiry lane to review their own scenarios, tool-call traces, provider behavior, and remediation priorities. The public demo is not a hosted fine-tuning service, production deployment claim, or benchmark guarantee.
 
 ## Deployment Notes
 
 - Keep the sitemap and robots file aligned with the final production domain.
 - Submit the canonical URL and sitemap in Google Search Console after the domain is connected.
-- The lead-capture path is a GitHub Issue Form so private workspace and paid-package requests create a trackable queue before payment infrastructure is added.
+- The lead-capture path is the central private inquiry route using `offer=tool-call-finetune-lab` and `inquiry=agent-reliability-audit`; preserve that lane ID when updating CTAs.
 - Keep exact free-tier quotas out of public promises because provider limits change.

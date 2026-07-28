@@ -1,13 +1,13 @@
 # Tool-Call Fine-Tune Lab
 
-Purpose: fine-tuning and eval pipeline for tool-call datasets, BFCL-style tests, and serving checks
+Purpose: agent reliability audit surface for tool-call fine-tuning pipelines, BFCL-style evaluation, schema fidelity, and serving readiness
 Free entry point: free open-source pipeline and sample eval reports
-Paid boundary: paid dataset preparation pack, eval report, and private fine-tuning runbook
+Paid boundary: fixed-scope Agent Reliability Audit for private scenario suites, trace review, failure taxonomy, provider scorecard, and prioritized remediation plan
 Canonical URL: https://kim3310.github.io/tool-call-finetune-lab/
 Repository: https://github.com/KIM3310/tool-call-finetune-lab
 System architecture: https://github.com/KIM3310/tool-call-finetune-lab/blob/main/docs/system-architecture.md
 Revenue architecture: https://github.com/KIM3310/tool-call-finetune-lab/blob/main/docs/revenue-architecture.md
-Lead capture: https://github.com/KIM3310/tool-call-finetune-lab/issues/new?template=service-inquiry.yml&title=Private+workspace+inquiry%3A+Tool-Call+Fine-Tune+Lab
+Lead capture: https://kim3310-doeon-kim-portfolio.pages.dev/?offer=tool-call-finetune-lab&inquiry=agent-reliability-audit#private-inquiry
 Commercial route: https://kim3310-doeon-kim-portfolio.pages.dev/?offer=tool-call-finetune-lab#service-offers
 
-Use this project as a runnable or inspectable reference for Tool-Call Fine-Tune Lab demo, Tool-Call Fine-Tune Lab system architecture, Tool-Call Fine-Tune Lab developer tool, fine-tuning and eval pipeline for tool-call datasets, BFCL-style tests, and serving checks service.
+Use this project as a runnable or inspectable synthetic reference for Tool-Call Fine-Tune Lab demo, Tool-Call Fine-Tune Lab system architecture, Tool-Call Fine-Tune Lab developer tool, and agent reliability audit review of tool-call eval pipelines. The public demo is not a hosted fine-tuning service, production deployment claim, or benchmark guarantee.

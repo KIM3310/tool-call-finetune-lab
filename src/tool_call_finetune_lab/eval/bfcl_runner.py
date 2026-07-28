@@ -294,8 +294,9 @@ def evaluate(
         category_latency[category].append(latency)
         category_total[category] += 1
 
-        # Check correctness: all expected calls must be predicted (in any order)
-        if predicted_calls and len(predicted_calls) >= len(expected_calls):
+        # BFCL-style correctness requires a one-to-one match. Extra calls can
+        # trigger unintended side effects and therefore count as failures.
+        if predicted_calls and len(predicted_calls) == len(expected_calls):
             # For each expected call, find a match in predicted
             matched = 0
             pred_remaining = list(predicted_calls)
