@@ -1,4 +1,4 @@
-.PHONY: install data train eval quantize serve pipeline test lint format typecheck check clean verify help install-gpu merge smoke-test test-cov
+.PHONY: install data train eval quantize serve pipeline test lint format typecheck check clean verify help install-gpu merge smoke-test test-cov deploy-cloudflare-pages
 
 PYTHON ?= python3.11
 VENV ?= .venv
@@ -49,6 +49,9 @@ test: ## Run unit tests
 
 test-cov: ## Run tests with coverage report
 	$(VENV_PYTHON) -m pytest tests/ -v --tb=short --cov=tool_call_finetune_lab --cov-report=term-missing
+
+deploy-cloudflare-pages: ## Deploy the static site directory to Cloudflare Pages
+	npx --yes wrangler@latest pages deploy site --project-name tool-call-finetune-lab
 
 lint: ## Run linter (ruff)
 	$(VENV_PYTHON) -m ruff check src/ tests/

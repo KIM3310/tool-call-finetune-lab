@@ -1,7 +1,7 @@
 {
   "name": "Tool-Call Fine-Tune Lab",
   "slug": "tool-call-finetune-lab",
-  "canonical_url": "https://kim3310.github.io/tool-call-finetune-lab/",
+  "canonical_url": "https://tool-call-finetune-lab.pages.dev/",
   "repository_url": "https://github.com/KIM3310/tool-call-finetune-lab",
   "architecture_url": "https://github.com/KIM3310/tool-call-finetune-lab/blob/main/docs/system-architecture.md",
   "revenue_architecture_url": "https://github.com/KIM3310/tool-call-finetune-lab/blob/main/docs/revenue-architecture.md",
@@ -43,7 +43,7 @@
     "name": "Tool-Call Fine-Tune Lab",
     "applicationCategory": "DeveloperApplication",
     "operatingSystem": "Web, serverless, and local development environments",
-    "url": "https://kim3310.github.io/tool-call-finetune-lab/",
+    "url": "https://tool-call-finetune-lab.pages.dev/",
     "codeRepository": "https://github.com/KIM3310/tool-call-finetune-lab",
     "description": "Tool-Call Fine-Tune Lab supports an agent reliability audit surface for tool-call fine-tuning pipelines, BFCL-style evaluation, schema fidelity, and serving readiness. The public demo is credential-free and synthetic; private work uses the central Agent Reliability Audit inquiry lane.",
     "creator": {
@@ -58,7 +58,7 @@
         "price": "0",
         "priceCurrency": "USD",
         "availability": "https://schema.org/InStock",
-        "url": "https://kim3310.github.io/tool-call-finetune-lab/"
+        "url": "https://tool-call-finetune-lab.pages.dev/"
       },
       {
         "@type": "Offer",

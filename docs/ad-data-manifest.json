@@ -6,7 +6,7 @@
   "audience": "LLM evaluation engineers and dataset reviewers",
   "public_resource": {
     "url": "https://kim3310-doeon-kim-portfolio.pages.dev/resources/tool-call-finetune-lab/",
-    "live_demo": "https://kim3310.github.io/tool-call-finetune-lab/",
+    "live_demo": "https://tool-call-finetune-lab.pages.dev/",
     "readiness_checklist": [
       "Architecture Summary",
       "Runtime And Data Flow",

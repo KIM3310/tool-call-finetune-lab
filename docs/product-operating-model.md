@@ -2,7 +2,7 @@
 
 ## Public Demo
 
-- URL: https://kim3310.github.io/tool-call-finetune-lab/
+- URL: https://tool-call-finetune-lab.pages.dev/
 - Scope: credential-free synthetic demonstration of the training, evaluation, and serving path.
 
 Repository: `tool-call-finetune-lab`

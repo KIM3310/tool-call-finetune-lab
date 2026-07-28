@@ -3,7 +3,7 @@
 Purpose: agent reliability audit surface for tool-call fine-tuning pipelines, BFCL-style evaluation, schema fidelity, and serving readiness
 Free entry point: free open-source pipeline and sample eval reports
 Paid boundary: fixed-scope Agent Reliability Audit for private scenario suites, trace review, failure taxonomy, provider scorecard, and prioritized remediation plan
-Canonical URL: https://kim3310.github.io/tool-call-finetune-lab/
+Canonical URL: https://tool-call-finetune-lab.pages.dev/
 Repository: https://github.com/KIM3310/tool-call-finetune-lab
 System architecture: https://github.com/KIM3310/tool-call-finetune-lab/blob/main/docs/system-architecture.md
 Revenue architecture: https://github.com/KIM3310/tool-call-finetune-lab/blob/main/docs/revenue-architecture.md

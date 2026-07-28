@@ -1,0 +1,7 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "tool-call-finetune-lab",
+  "compatibility_date": "2026-07-28",
+  "pages_build_output_dir": "./site",
+  "send_metrics": false
+}

@@ -2,7 +2,7 @@
 
 ## Agent Reliability Audit Surface
 
-- [Open the public GitHub Pages demo](https://kim3310.github.io/tool-call-finetune-lab/)
+- [Open the public GitHub Pages demo](https://tool-call-finetune-lab.pages.dev/)
 - Scope: credential-free, synthetic-data preview of the dataset, evaluation, and serving workflow.
 - Private CTA: request a fixed-scope [Agent Reliability Audit](https://kim3310-doeon-kim-portfolio.pages.dev/?offer=tool-call-finetune-lab&inquiry=agent-reliability-audit#private-inquiry) using the central private inquiry lane.
 - Demo boundary: the public page shows synthetic tool-call eval examples and implementation notes. It is not a hosted fine-tuning service, customer dataset review, production deployment claim, or benchmark guarantee.
@@ -233,7 +233,7 @@ Apache-2.0 -- see [LICENSE](LICENSE).
 
 - Public entry: free open-source pipeline and sample eval reports
 - Paid boundary: fixed-scope Agent Reliability Audit for private scenario suites, trace review, failure taxonomy, provider scorecard, and prioritized remediation plan
-- Canonical URL: https://kim3310.github.io/tool-call-finetune-lab/
+- Canonical URL: https://tool-call-finetune-lab.pages.dev/
 - Lead capture: https://kim3310-doeon-kim-portfolio.pages.dev/?offer=tool-call-finetune-lab&inquiry=agent-reliability-audit#private-inquiry
 - Resource route: https://kim3310-doeon-kim-portfolio.pages.dev/resources/tool-call-finetune-lab/
 - Commercial route: https://kim3310-doeon-kim-portfolio.pages.dev/?offer=tool-call-finetune-lab#service-offers
