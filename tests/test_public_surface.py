@@ -57,8 +57,7 @@ def test_static_site_is_cloudflare_and_adsense_ready() -> None:
 
     makefile = (ROOT / "Makefile").read_text()
     assert (
-        "npx --yes wrangler@latest pages deploy site "
-        "--project-name tool-call-finetune-lab"
+        "npx --yes wrangler@latest pages deploy site --project-name tool-call-finetune-lab"
     ) in makefile
 
     for relative in ["site/index.html", "site/privacy.html", "site/terms.html"]:
@@ -66,8 +65,7 @@ def test_static_site_is_cloudflare_and_adsense_ready() -> None:
         assert f'name="google-adsense-account" content="{adsense_client}"' in html
 
     loader = (
-        "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
-        f"?client={adsense_client}"
+        f"https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={adsense_client}"
     )
     assert loader not in (ROOT / "site/index.html").read_text()
     for relative in [
