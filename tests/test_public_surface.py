@@ -69,14 +69,31 @@ def test_static_site_is_cloudflare_and_adsense_ready() -> None:
         "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
         f"?client={adsense_client}"
     )
-    assert loader in (ROOT / "site/index.html").read_text()
-    assert loader not in (ROOT / "site/privacy.html").read_text()
-    assert loader not in (ROOT / "site/terms.html").read_text()
+    assert loader not in (ROOT / "site/index.html").read_text()
+    for relative in [
+        "site/guide.html",
+        "site/architecture.html",
+        "site/verification.html",
+    ]:
+        assert loader in (ROOT / relative).read_text()
+    for relative in [
+        "site/publisher.html",
+        "site/privacy.html",
+        "site/terms.html",
+    ]:
+        assert loader not in (ROOT / relative).read_text()
 
     robots = (ROOT / "site/robots.txt").read_text()
     sitemap = (ROOT / "site/sitemap.xml").read_text()
     assert "Sitemap: https://tool-call-finetune-lab.pages.dev/sitemap.xml" in robots
-    for route in ["privacy.html", "terms.html", "ads.txt"]:
+    for route in [
+        "guide.html",
+        "architecture.html",
+        "verification.html",
+        "publisher.html",
+        "privacy.html",
+        "terms.html",
+    ]:
         assert f"https://tool-call-finetune-lab.pages.dev/{route}" in sitemap
 
 

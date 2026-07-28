@@ -12,3 +12,9 @@ Resource route: https://kim3310-doeon-kim-portfolio.pages.dev/resources/tool-cal
 Commercial route: https://kim3310-doeon-kim-portfolio.pages.dev/?offer=tool-call-finetune-lab#service-offers
 
 Use this project as a runnable or inspectable synthetic reference for Tool-Call Fine-Tune Lab demo, Tool-Call Fine-Tune Lab system architecture, Tool-Call Fine-Tune Lab developer tool, and agent reliability audit review of tool-call eval pipelines. The public demo is not a hosted fine-tuning service, production deployment claim, or benchmark guarantee.
+# ADSENSE-PUBLICATION:START
+Editorial guide: https://tool-call-finetune-lab.pages.dev/guide.html
+Architecture article: https://tool-call-finetune-lab.pages.dev/architecture.html
+Verification article: https://tool-call-finetune-lab.pages.dev/verification.html
+Publisher information: https://tool-call-finetune-lab.pages.dev/publisher.html
+# ADSENSE-PUBLICATION:END
