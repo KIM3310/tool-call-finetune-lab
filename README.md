@@ -2,13 +2,12 @@
 
 ## Agent Reliability Audit Surface
 
-- [Open the public GitHub Pages demo](https://tool-call-finetune-lab.pages.dev/)
+- [Open the public Cloudflare Pages demo](https://tool-call-finetune-lab.pages.dev/)
 - Scope: credential-free, synthetic-data preview of the dataset, evaluation, and serving workflow.
 - Private CTA: request a fixed-scope [Agent Reliability Audit](https://kim3310-doeon-kim-portfolio.pages.dev/?offer=tool-call-finetune-lab&inquiry=agent-reliability-audit#private-inquiry) using the central private inquiry lane.
 - Demo boundary: the public page shows synthetic tool-call eval examples and implementation notes. It is not a hosted fine-tuning service, customer dataset review, production deployment claim, or benchmark guarantee.
 
 [![CI](https://github.com/KIM3310/tool-call-finetune-lab/actions/workflows/ci.yml/badge.svg)](https://github.com/KIM3310/tool-call-finetune-lab/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/KIM3310/tool-call-finetune-lab/branch/main/graph/badge.svg)](https://codecov.io/gh/KIM3310/tool-call-finetune-lab)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/downloads/)
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-green.svg)](LICENSE)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.1%2B-EE4C2C.svg?logo=pytorch)](https://pytorch.org/)
@@ -174,8 +173,8 @@ make help                   # all targets
 | Artifact | Link |
 |----------|------|
 | Kaggle kernel | [kaggle.com/code/doeonkim00/tool-call-fine-tune-lab-qlora-pipeline](https://www.kaggle.com/code/doeonkim00/tool-call-fine-tune-lab-qlora-pipeline) |
-| LoRA adapter | [huggingface.co/KIM3310/qwen2.5-7b-tool-calling-lora](https://huggingface.co/KIM3310/qwen2.5-7b-tool-calling-lora) |
-| AWQ quantized | [huggingface.co/KIM3310/qwen2.5-7b-tool-calling-awq](https://huggingface.co/KIM3310/qwen2.5-7b-tool-calling-awq) |
+| LoRA adapter | Private Hugging Face artifact; not part of the public verification path. |
+| AWQ quantized | Private Hugging Face artifact; not part of the public verification path. |
 | W&B run | [wandb.ai/KIM3310/tool-call-finetune-lab](https://wandb.ai/KIM3310/tool-call-finetune-lab) |
 
 ## Layout
