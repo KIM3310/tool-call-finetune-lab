@@ -1,19 +1,43 @@
-.PHONY: install data train eval quantize serve pipeline test lint format typecheck check clean verify help install-gpu merge smoke-test test-cov deploy-cloudflare-pages
+.PHONY: check-python install data train eval quantize serve pipeline test lint format format-check typecheck check clean verify help install-gpu merge smoke-test test-cov deploy-cloudflare-pages
 
-PYTHON ?= python3.11
+PYTHON_MIN_VERSION := 3.10
 VENV ?= .venv
 VENV_PYTHON := $(VENV)/bin/python
+PYTHON_CANDIDATES = $(VENV_PYTHON) python3.13 python3.12 python3.11 python3.10 python3
+PYTHON ?= $(shell for py in $(PYTHON_CANDIDATES); do \
+	if command -v $$py >/dev/null 2>&1 && $$py -c 'import sys; raise SystemExit(0 if sys.version_info >= (3, 10) else 1)' >/dev/null 2>&1; then \
+		command -v $$py; \
+		break; \
+	fi; \
+done)
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}'
 
-install: ## Install package in editable mode with dev dependencies
-	test -x "$(VENV_PYTHON)" || $(PYTHON) -m venv $(VENV)
+check-python:
+	@if [ -z "$(PYTHON)" ]; then \
+		echo "Python $(PYTHON_MIN_VERSION)+ is required." >&2; \
+		echo "Install Python $(PYTHON_MIN_VERSION)+ or run: make PYTHON=/path/to/python$(PYTHON_MIN_VERSION) <target>" >&2; \
+		exit 1; \
+	fi
+	@$(PYTHON) -c 'import sys; raise SystemExit(0 if sys.version_info >= (3, 10) else 1)' || { \
+		echo "PYTHON=$(PYTHON) is not Python $(PYTHON_MIN_VERSION)+." >&2; \
+		exit 1; \
+	}
+
+install: check-python ## Install package in editable mode with dev dependencies
+	@if [ ! -x "$(VENV_PYTHON)" ] || ! $(VENV_PYTHON) -c 'import sys; raise SystemExit(0 if sys.version_info >= (3, 10) else 1)' >/dev/null 2>&1; then \
+		rm -rf $(VENV); \
+		$(PYTHON) -m venv $(VENV); \
+	fi
 	$(VENV_PYTHON) -m pip install --upgrade pip
 	$(VENV_PYTHON) -m pip install -e ".[dev]"
 
-install-gpu: ## Install with all GPU dependencies (train + quantize + serve)
-	test -x "$(VENV_PYTHON)" || $(PYTHON) -m venv $(VENV)
+install-gpu: check-python ## Install with all GPU dependencies (train + quantize + serve)
+	@if [ ! -x "$(VENV_PYTHON)" ] || ! $(VENV_PYTHON) -c 'import sys; raise SystemExit(0 if sys.version_info >= (3, 10) else 1)' >/dev/null 2>&1; then \
+		rm -rf $(VENV); \
+		$(PYTHON) -m venv $(VENV); \
+	fi
 	$(VENV_PYTHON) -m pip install --upgrade pip
 	$(VENV_PYTHON) -m pip install -e ".[gpu,dev]"
 
@@ -56,6 +80,9 @@ deploy-cloudflare-pages: ## Deploy the static site directory to Cloudflare Pages
 lint: ## Run linter (ruff)
 	$(VENV_PYTHON) -m ruff check src/ tests/
 
+format-check: ## Check formatting without modifying files
+	$(VENV_PYTHON) -m ruff format --check src/ tests/
+
 format: ## Auto-format code (ruff)
 	$(VENV_PYTHON) -m ruff format src/ tests/
 	$(VENV_PYTHON) -m ruff check --fix src/ tests/
@@ -63,9 +90,9 @@ format: ## Auto-format code (ruff)
 typecheck: ## Run type checker (mypy)
 	$(VENV_PYTHON) -m mypy src/tool_call_finetune_lab/ --ignore-missing-imports
 
-check: lint typecheck test ## Run all checks (lint + typecheck + test)
+check: lint format-check typecheck test ## Run all checks (lint + format + typecheck + test)
 
-verify: install test lint ## Run verification (self-bootstrap + test + lint)
+verify: install check ## Run the same lint, format, type, and test checks as CI
 	@echo "Verification complete."
 
 clean: ## Remove build artifacts and caches
