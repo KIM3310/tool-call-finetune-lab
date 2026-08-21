@@ -109,14 +109,17 @@ stage-pilot copilot
 ## Quick Start
 
 ```bash
-# install
+# install into the project-local .venv used by every Make target
 git clone https://github.com/KIM3310/tool-call-finetune-lab
 cd tool-call-finetune-lab
-pip install -e ".[dev]"
+make install
 
-# with GPU deps:
-pip install -e ".[gpu,dev]"
+# with GPU deps instead:
+make install-gpu
 ```
+
+The Makefile discovers an available Python 3.10+ interpreter. Override discovery
+when needed with `make PYTHON=/path/to/python3.10 install`.
 
 ```bash
 make data                   # download + merge + split (no GPU)
@@ -159,10 +162,11 @@ Full pipeline notebook: [kaggle.com/code/doeonkim00/tool-call-fine-tune-lab-qlor
 ## Dev
 
 ```bash
-make check                  # lint + typecheck + test
+make check                  # lint + format check + typecheck + test
 make test                   # pytest
 make test-cov               # with coverage
 make lint                   # ruff
+make format-check           # check formatting without edits
 make format                 # auto-format
 make typecheck              # mypy
 make help                   # all targets
