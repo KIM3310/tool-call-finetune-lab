@@ -51,3 +51,5 @@ No GPU training, checkpoint validation, or live-provider quality measurement was
 [Engineering notes](docs/engineering-notes.md) · [Full historical setup reference](REFERENCE.md) · [Source](https://github.com/KIM3310/tool-call-finetune-lab)
 
 [Cloud architecture](docs/cloud-ai-architecture.md) · [Blueprint](docs/architecture/blueprint.json) · [Blueprint validator](scripts/validate_architecture_blueprint.py)
+
+[Design decisions and implementation evidence](docs/IMPLEMENTATION_NOTES.md)
