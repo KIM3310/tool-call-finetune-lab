@@ -44,7 +44,7 @@ make serve
 
 These paths require compatible GPU hardware, model/data assets, and any necessary credentials. Pipeline stages run sequentially, including under `make -j`. The vLLM evaluator honors its timeout and `VLLM_API_KEY`.
 
-Container serving binds to loopback by default. The explicit [`docker-compose.production.yml`](docker-compose.production.yml) override requires auth, a configured reverse proxy, and firewall restrictions before public exposure. See [the serving reference](REFERENCE.md#serving).
+Container serving binds to loopback by default. The explicit [`docker-compose.production.yml`](docker-compose.production.yml) override requires auth, a configured reverse proxy, and firewall restrictions before public exposure. See [the serving reference](REFERENCE.md#docker).
 
 No GPU training, checkpoint validation, or live-provider quality measurement was performed in this upgrade. Historical private model artifacts are not evidence available through this public repository. The checked-in contract report proves evaluation/data-processing behavior, not a model-quality improvement.
 
