@@ -11,6 +11,7 @@ from __future__ import annotations
 import hashlib
 import json
 import logging
+import math
 import random
 from collections import defaultdict
 from pathlib import Path
@@ -25,20 +26,31 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def _content_hash(example: Dict[str, Any]) -> str:
-    """Compute a deterministic hash of the messages content for deduplication."""
-    # Use the user message content + first tool call name as dedup key
-    messages = example.get("messages", [])
-    user_texts = [m["content"] for m in messages if m.get("role") == "user"]
-    tool_calls = []
-    for m in messages:
-        if m.get("role") == "assistant" and m.get("tool_calls"):
-            for tc in m["tool_calls"]:
-                fn = tc.get("function", {})
-                tool_calls.append(fn.get("name", ""))
+def _canonical_hash(payload: Any) -> str:
+    return hashlib.sha256(
+        json.dumps(payload, sort_keys=True, separators=(",", ":"), allow_nan=False).encode()
+    ).hexdigest()
 
-    key = json.dumps({"user": user_texts, "calls": tool_calls}, sort_keys=True)
-    return hashlib.sha256(key.encode()).hexdigest()
+
+def _content_hash(example: Dict[str, Any]) -> str:
+    """Deduplicate full conversation/tool content, preserving distinct labels."""
+    return _canonical_hash(
+        {"messages": example.get("messages", []), "tools": example.get("tools", [])}
+    )
+
+
+def _input_hash(example: Dict[str, Any]) -> str:
+    """Conservatively keep matching requests and tool schemas in one partition."""
+    return _canonical_hash(
+        {
+            "messages": [
+                message
+                for message in example.get("messages", [])
+                if message.get("role") in {"system", "user"}
+            ],
+            "tools": example.get("tools", []),
+        }
+    )
 
 
 def load_jsonl(path: str) -> List[Dict[str, Any]]:
@@ -46,17 +58,19 @@ def load_jsonl(path: str) -> List[Dict[str, Any]]:
     examples: List[Dict[str, Any]] = []
     p = Path(path)
     if not p.exists():
-        logger.warning("File not found: %s — skipping", path)
-        return examples
+        raise FileNotFoundError(f"Required data file not found: {path}")
     with open(p, encoding="utf-8") as f:
         for line_no, line in enumerate(f, 1):
             line = line.strip()
             if not line:
                 continue
             try:
-                examples.append(json.loads(line))
+                example = json.loads(line)
+                if not isinstance(example, dict):
+                    raise ValueError(f"Expected a JSON object at {path}:{line_no}")
+                examples.append(example)
             except json.JSONDecodeError as e:
-                logger.warning("JSON parse error at %s line %d: %s", path, line_no, e)
+                raise ValueError(f"Invalid JSON at {path}:{line_no}: {e}") from e
     logger.info("Loaded %d examples from %s", len(examples), path)
     return examples
 
@@ -86,48 +100,44 @@ def stratified_split(
     val_ratio: float,
     seed: int,
 ) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]], List[Dict[str, Any]]]:
-    """Stratified split by source (bfcl / glaive) and category.
+    """Split request groups, keeping matching inputs together across sources.
 
-    Returns (train, val, test) lists.
+    Source/category balance is approximate when groups span multiple strata.
+    Input ordering does not change the partition assigned with a fixed seed.
     """
-    # Deterministic data split, not cryptographic use.
-    rng = random.Random(seed)  # nosec B311
-
-    # Group by (source, category)
-    groups: Dict[Tuple[str, str], List[Dict[str, Any]]] = defaultdict(list)
-    for ex in examples:
-        key = (ex.get("source", "unknown"), ex.get("category", "unknown"))
-        groups[key].append(ex)
-
-    train: List[Dict[str, Any]] = []
-    val: List[Dict[str, Any]] = []
-    test: List[Dict[str, Any]] = []
-
-    for (source, cat), group in groups.items():
-        rng.shuffle(group)
-        n = len(group)
-        n_train = max(1, int(n * train_ratio))
-        n_val = max(0, int(n * val_ratio))
-        # remainder goes to test
-        train.extend(group[:n_train])
-        val.extend(group[n_train : n_train + n_val])
-        test.extend(group[n_train + n_val :])
-        logger.debug(
-            "  (%s, %s): %d total → %d train / %d val / %d test",
-            source,
-            cat,
-            n,
-            len(group[:n_train]),
-            len(group[n_train : n_train + n_val]),
-            len(group[n_train + n_val :]),
+    if (
+        any(
+            isinstance(value, bool) or not math.isfinite(value) or value < 0 or value > 1
+            for value in (train_ratio, val_ratio)
         )
-
-    # Shuffle each split
-    rng.shuffle(train)
-    rng.shuffle(val)
-    rng.shuffle(test)
-
-    return train, val, test
+        or train_ratio + val_ratio > 1
+    ):
+        raise ValueError("split ratios must be finite fractions with a sum at most one")
+    rng = random.Random(seed)  # nosec B311
+    request_groups: Dict[str, List[Dict[str, Any]]] = defaultdict(list)
+    for example in examples:
+        request_groups[_input_hash(example)].append(example)
+    strata: Dict[Tuple[str, str], List[str]] = defaultdict(list)
+    for key, group in request_groups.items():
+        stratum = min(
+            (str(ex.get("source", "unknown")), str(ex.get("category", "unknown"))) for ex in group
+        )
+        strata[stratum].append(key)
+    partitions: List[List[Dict[str, Any]]] = [[], [], []]
+    for stratum in sorted(strata):
+        keys = sorted(strata[stratum])
+        rng.shuffle(keys)
+        n = len(keys)
+        n_train = max(1, int(n * train_ratio)) if train_ratio > 0 else 0
+        n_val = int(n * val_ratio)
+        for index, key in enumerate(keys):
+            destination = 0 if index < n_train else 1 if index < n_train + n_val else 2
+            partitions[destination].extend(
+                sorted(request_groups[key], key=lambda ex: (_content_hash(ex), _canonical_hash(ex)))
+            )
+    for partition in partitions:
+        rng.shuffle(partition)
+    return partitions[0], partitions[1], partitions[2]
 
 
 def save_jsonl(examples: List[Dict[str, Any]], output_path: str) -> None:
@@ -223,8 +233,7 @@ def main() -> None:
 
     all_examples = bfcl_examples + glaive_examples
     if not all_examples:
-        logger.error("No examples found. Run prepare_bfcl.py and prepare_glaive.py first.")
-        return
+        raise ValueError("No examples found. Run prepare_bfcl.py and prepare_glaive.py first.")
 
     # Deduplicate
     all_examples = deduplicate(all_examples)

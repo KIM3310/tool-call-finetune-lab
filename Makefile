@@ -1,4 +1,4 @@
-.PHONY: check-python install data train eval quantize serve pipeline test lint format format-check typecheck check clean verify help install-gpu merge smoke-test test-cov deploy-cloudflare-pages
+.PHONY: proof check-python install data train eval quantize serve pipeline test lint format format-check typecheck check clean verify help install-gpu merge smoke-test test-cov deploy-cloudflare-pages
 
 PYTHON_MIN_VERSION := 3.10
 VENV ?= .venv
@@ -65,8 +65,12 @@ serve: ## Launch vLLM server with the quantized model
 smoke-test: ## Run smoke tests against a running vLLM server
 	$(VENV_PYTHON) -m tool_call_finetune_lab.serve.openai_compat_test
 
-pipeline: data train merge eval quantize ## Run the full pipeline (data -> train -> merge -> eval -> quantize)
-	@echo "Full pipeline complete."
+pipeline: ## Run each dependent pipeline stage sequentially, including under make -j
+	$(MAKE) data
+	$(MAKE) train
+	$(MAKE) merge
+	$(MAKE) eval
+	$(MAKE) quantize
 
 test: ## Run unit tests
 	$(VENV_PYTHON) -m pytest tests/ -v --tb=short
@@ -92,7 +96,12 @@ typecheck: ## Run type checker (mypy)
 
 check: lint format-check typecheck test ## Run all checks (lint + format + typecheck + test)
 
-verify: install check ## Run the same lint, format, type, and test checks as CI
+proof: ## Reproduce synthetic evaluator and data-split contracts without a GPU
+	$(VENV_PYTHON) -m tool_call_finetune_lab.eval.contract_probe
+
+verify: install ## Install first, then run checks and reproduce committed contract evidence
+	$(MAKE) check
+	$(VENV_PYTHON) -m tool_call_finetune_lab.eval.contract_probe --check
 	@echo "Verification complete."
 
 clean: ## Remove build artifacts and caches

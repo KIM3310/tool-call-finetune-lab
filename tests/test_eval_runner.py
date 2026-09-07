@@ -95,20 +95,20 @@ class TestToolCallMatching:
         exp = {"name": "get_weather", "arguments": {"city": "Tokyo"}}
         assert _tool_call_matches(pred, exp) is False
 
-    def test_extra_arguments_are_ok(self) -> None:
+    def test_extra_arguments_are_rejected(self) -> None:
         from tool_call_finetune_lab.eval.bfcl_runner import _tool_call_matches
 
-        # Prediction has extra args beyond what's expected — still matches
+        # Extra arguments can alter behavior and must not count as an exact match.
         pred = {"name": "get_weather", "arguments": {"city": "Tokyo", "unit": "celsius"}}
         exp = {"name": "get_weather", "arguments": {"city": "Tokyo"}}
-        assert _tool_call_matches(pred, exp) is True
+        assert _tool_call_matches(pred, exp) is False
 
-    def test_case_insensitive_values(self) -> None:
+    def test_case_sensitive_values(self) -> None:
         from tool_call_finetune_lab.eval.bfcl_runner import _tool_call_matches
 
         pred = {"name": "get_weather", "arguments": {"city": "TOKYO"}}
         exp = {"name": "get_weather", "arguments": {"city": "tokyo"}}
-        assert _tool_call_matches(pred, exp) is True
+        assert _tool_call_matches(pred, exp) is False
 
     def test_arguments_as_json_string(self) -> None:
         from tool_call_finetune_lab.eval.bfcl_runner import _tool_call_matches
@@ -122,7 +122,7 @@ class TestToolCallMatching:
 
         pred = {"name": "fn", "arguments": {"x": 1}}
         exp = {"name": "fn", "arguments": {}}
-        assert _tool_call_matches(pred, exp) is True
+        assert _tool_call_matches(pred, exp) is False
 
 
 # ---------------------------------------------------------------------------
@@ -147,13 +147,13 @@ class TestNormalizeArguments:
         from tool_call_finetune_lab.eval.bfcl_runner import _normalize_arguments
 
         result = _normalize_arguments("not json")
-        assert "_raw" in result
+        assert result is None
 
     def test_non_dict_non_string(self) -> None:
         from tool_call_finetune_lab.eval.bfcl_runner import _normalize_arguments
 
         result = _normalize_arguments(None)
-        assert result == {}
+        assert result is None
 
 
 # ---------------------------------------------------------------------------

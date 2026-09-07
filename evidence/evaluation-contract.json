@@ -1,0 +1,59 @@
+{
+  "official_bfcl_score": false,
+  "schema_version": 1,
+  "scope": "Synthetic evaluator-contract checks; no model inference or training performed",
+  "scoring_cases": [
+    {
+      "accepted": true,
+      "case": "exact object",
+      "expected": true
+    },
+    {
+      "accepted": false,
+      "case": "numeric string",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "boolean as number",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "extra argument",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "case-sensitive identifier",
+      "expected": false
+    },
+    {
+      "accepted": true,
+      "case": "JSON object key ordering",
+      "expected": true
+    }
+  ],
+  "source_sha256": {
+    "data/merge_and_split.py": "73e64a664659927f2da71216cd4c53be104496d038c7164aba74c360b54b99c3",
+    "eval/bfcl_runner.py": "3c8f3f498dc29aa1cd2d19c1e80003ed00a4edb66e8402a3c7d9d29d280a64ed",
+    "eval/compare.py": "598b55615ab383db2404b68739b448a667b171cf20cd496bc105f0222525b1bf"
+  },
+  "split": {
+    "cross_partition_request_overlap": 0,
+    "input_order_invariant": true,
+    "request_groups": [
+      12,
+      4,
+      4
+    ],
+    "rows": [
+      24,
+      8,
+      8
+    ],
+    "seed": 7,
+    "unique_rows": 40
+  },
+  "target_answer_and_future_context_excluded": true
+}

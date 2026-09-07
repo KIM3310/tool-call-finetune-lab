@@ -15,8 +15,11 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import logging
+import math
+import os
 import time
 from collections import defaultdict
 from pathlib import Path
@@ -57,14 +60,16 @@ def _extract_tool_calls_from_response(response_text: str) -> List[Dict[str, Any]
         raw = match.group(1).strip()
         try:
             obj = json.loads(raw)
+            if not isinstance(obj, dict) or not isinstance(obj.get("name"), str) or not obj["name"]:
+                return []
             calls.append(
                 {
                     "name": obj.get("name", ""),
                     "arguments": obj.get("arguments", {}),
                 }
             )
-        except json.JSONDecodeError:
-            pass
+        except (ValueError, RecursionError):
+            return []
 
     if calls:
         return calls
@@ -86,43 +91,50 @@ def _extract_tool_calls_from_response(response_text: str) -> List[Dict[str, Any]
     return calls
 
 
-def _normalize_arguments(args: Any) -> Dict[str, Any]:
-    """Normalize tool call arguments to a dict for comparison."""
+def _normalize_arguments(args: Any) -> Optional[Dict[str, Any]]:
+    """Decode a JSON object; invalid values never become an empty argument set."""
     if isinstance(args, str):
         try:
-            parsed = json.loads(args)
-            return parsed if isinstance(parsed, dict) else {"_raw": parsed}
-        except json.JSONDecodeError:
-            return {"_raw": args}
-    if isinstance(args, dict):
-        return args
-    return {}
+            args = json.loads(args)
+        except (ValueError, RecursionError):
+            return None
+    return args if isinstance(args, dict) else None
+
+
+def _json_equal(left: Any, right: Any) -> bool:
+    """Compare JSON values without coercing strings, booleans, or object keys."""
+    if isinstance(left, bool) or isinstance(right, bool):
+        return type(left) is type(right) and left == right
+    if isinstance(left, (int, float)) and isinstance(right, (int, float)):
+        return (
+            (not isinstance(left, float) or math.isfinite(left))
+            and (not isinstance(right, float) or math.isfinite(right))
+            and left == right
+        )
+    if type(left) is not type(right):
+        return False
+    if isinstance(left, dict):
+        return left.keys() == right.keys() and all(
+            isinstance(key, str) and _json_equal(value, right[key]) for key, value in left.items()
+        )
+    if isinstance(left, list):
+        return len(left) == len(right) and all(
+            _json_equal(a, b) for a, b in zip(left, right, strict=True)
+        )
+    return isinstance(left, (str, type(None))) and left == right
 
 
 def _tool_call_matches(predicted: Dict[str, Any], expected: Dict[str, Any]) -> bool:
-    """Check if a predicted tool call matches the expected one.
+    """Strict local scorer: exact function identity and complete JSON arguments.
 
-    Rules:
-    - Function name must match exactly
-    - All required arguments must be present and match (string comparison with normalization)
+    This normalized-call contract is not the official BFCL AST/execution evaluator.
     """
-    if predicted.get("name") != expected.get("name"):
+    name = predicted.get("name")
+    if not isinstance(name, str) or not name or name != expected.get("name"):
         return False
-
     pred_args = _normalize_arguments(predicted.get("arguments", {}))
     exp_args = _normalize_arguments(expected.get("arguments", {}))
-
-    # Check all expected keys are present and values match
-    for key, exp_val in exp_args.items():
-        if key not in pred_args:
-            return False
-        # Normalize to string for comparison
-        pred_str = str(pred_args[key]).strip().lower()
-        exp_str = str(exp_val).strip().lower()
-        if pred_str != exp_str:
-            return False
-
-    return True
+    return pred_args is not None and exp_args is not None and _json_equal(pred_args, exp_args)
 
 
 # ---------------------------------------------------------------------------
@@ -136,7 +148,11 @@ class VLLMBackend:
     def __init__(self, base_url: str, model_name: str, timeout: int = 60) -> None:
         from openai import OpenAI
 
-        self.client = OpenAI(base_url=base_url, api_key="EMPTY")
+        if not math.isfinite(timeout) or timeout <= 0:
+            raise ValueError("timeout must be positive and finite")
+        self.client = OpenAI(
+            base_url=base_url, api_key=os.environ.get("VLLM_API_KEY") or "EMPTY", timeout=timeout
+        )
         self.model_name = model_name
         self.timeout = timeout
 
@@ -211,6 +227,7 @@ class LocalHFBackend:
             code_revision=code_revision,
         )
         self.max_seq_length = max_seq_length
+        self.model_name = model_path
 
     def predict(
         self,
@@ -263,23 +280,25 @@ def evaluate(
         messages = ex.get("messages", [])
         tools = ex.get("tools", [])
 
-        # Build inference messages (exclude the expected assistant response)
-        inference_msgs = [m for m in messages if m["role"] != "assistant"]
-        # Get expected tool calls from the last assistant message
-        expected_calls: List[Dict[str, Any]] = []
-        for m in messages:
-            if m.get("role") == "assistant" and m.get("tool_calls"):
-                for tc in m["tool_calls"]:
-                    fn = tc.get("function", tc)
-                    expected_calls.append(
-                        {
-                            "name": fn.get("name", ""),
-                            "arguments": fn.get("arguments", {}),
-                        }
-                    )
-
-        if not expected_calls:
+        # Evaluate the last tool-call turn, preserving earlier context and excluding
+        # the target answer and every subsequent tool result or user message.
+        targets = [
+            index
+            for index, message in enumerate(messages)
+            if message.get("role") == "assistant" and message.get("tool_calls")
+        ]
+        if not targets:
             continue
+        target_index = targets[-1]
+        inference_msgs = messages[:target_index]
+        expected_calls: List[Dict[str, Any]] = []
+        for call in messages[target_index]["tool_calls"]:
+            function = call.get("function", call)
+            if not isinstance(function, dict) or not isinstance(function.get("name"), str):
+                raise ValueError(f"Malformed target tool call in example {i}")
+            expected_calls.append(
+                {"name": function["name"], "arguments": function.get("arguments", {})}
+            )
 
         try:
             t0 = time.perf_counter()
@@ -363,7 +382,23 @@ def evaluate(
         overall_accuracy * 100,
     )
 
-    return {"categories": results, "failures": failures[:50]}  # cap failure log
+    return {
+        "categories": results,
+        "failures": failures[:50],
+        "metadata": {
+            "scoring_contract": "normalized-tool-call-exact-v2",
+            "official_bfcl_score": False,
+            "model": getattr(backend, "model_name", "unspecified"),
+            "dataset_sha256": hashlib.sha256(
+                json.dumps(test_examples, sort_keys=True, separators=(",", ":")).encode()
+            ).hexdigest(),
+            "input_examples": len(test_examples),
+            "evaluated_examples": all_total,
+            "skipped_examples": len(test_examples) - all_total,
+            "failure_count": len(failures),
+            "failure_log_truncated": len(failures) > 50,
+        },
+    }
 
 
 def load_test_data(test_file: str) -> List[Dict[str, Any]]:
