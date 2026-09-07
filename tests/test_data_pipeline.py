@@ -654,8 +654,8 @@ class TestMergeAndSplit:
     def test_load_jsonl_missing_file(self, tmp_path: Path) -> None:
         from tool_call_finetune_lab.data.merge_and_split import load_jsonl
 
-        result = load_jsonl(str(tmp_path / "nonexistent.jsonl"))
-        assert result == []
+        with pytest.raises(FileNotFoundError):
+            load_jsonl(str(tmp_path / "nonexistent.jsonl"))
 
     def test_save_jsonl_roundtrip(
         self, tmp_path: Path, sample_examples: List[Dict[str, Any]]
