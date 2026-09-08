@@ -289,7 +289,8 @@ class TestServeConfig:
         captured = capsys.readouterr()
         assert secret not in captured.out
         assert secret not in caplog.text
-        assert "[REDACTED]" in captured.out
+        assert "configuration validated; server was not started" in captured.out
+        assert "--api-key" not in captured.out + caplog.text
 
     @pytest.mark.parametrize("value", ["1", "true", "TRUE", "yes", "on"])
     def test_public_bind_env_parser_accepts_only_documented_true_values(self, value: str) -> None:
