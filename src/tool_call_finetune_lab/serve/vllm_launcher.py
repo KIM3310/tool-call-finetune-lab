@@ -223,7 +223,7 @@ def launch(
     """Launch the vLLM server process.
 
     Args:
-        dry_run: If True, print the command but don't execute it.
+        dry_run: If True, validate the configuration without starting the server.
 
     Returns:
         The Popen process handle (or None if dry_run).
@@ -255,13 +255,12 @@ def launch(
         api_key=api_key,
     )
 
-    display_command = redact_command(cmd)
-    logger.info("vLLM command: %s", " ".join(display_command))
+    # Keep credential-bearing argv out of every display path, even after redaction.
+    logger.info("vLLM launch configuration validated")
     logger.info("Model will be served at http://%s:%d/v1", host, port)
 
     if dry_run:
-        print("DRY RUN — would execute:")
-        print(" ".join(display_command))
+        print("DRY RUN — configuration validated; server was not started.")
         return None
 
     # Set HF token if available
